@@ -17,7 +17,7 @@ Windows cycle through slots: 5th window → slot 1, 6th → slot 2, etc.
 import platform
 import subprocess
 
-from ..logger import log
+from ..utils.logger import log
 
 _screen_size_cache: tuple[int, int] | None = None
 

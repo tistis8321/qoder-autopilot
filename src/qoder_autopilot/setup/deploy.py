@@ -253,7 +253,7 @@ def _detect_worker_url(work_dir: Path) -> str | None:
 
 def save_worker_url(url: str) -> None:
     """Save the worker URL to user config."""
-    from .user_config import set_user_config_value
+    from ..infra.user_config import set_user_config_value
 
     if set_user_config_value("worker_url", url):
         ok(f"Config saved: worker-url = {url}")

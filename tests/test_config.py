@@ -1,6 +1,6 @@
 """Tests for configuration module."""
 
-from qoder_autopilot.config import Settings, settings
+from qoder_autopilot.infra.config import Settings, settings
 
 
 class TestSettings:
@@ -44,12 +44,24 @@ class TestSettings:
         """Settings should have all expected fields."""
         field_names = set(Settings.model_fields.keys())
         expected = {
-            "worker_url", "qoder_signup_url", "qoder_signin_url",
-            "qoder_login_url", "qoder_device_token_url", "qoder_userinfo_url",
-            "ninerouter_url", "ninerouter_password", "ninerouter_db",
-            "ai_api_key", "ai_base_url", "ai_model",
-            "captcha_timeout", "otp_timeout", "max_captcha_attempts",
-            "parallel_delay", "screenshots_dir", "credentials_file",
+            "worker_url",
+            "qoder_signup_url",
+            "qoder_signin_url",
+            "qoder_login_url",
+            "qoder_device_token_url",
+            "qoder_userinfo_url",
+            "ninerouter_url",
+            "ninerouter_password",
+            "ninerouter_db",
+            "ai_api_key",
+            "ai_base_url",
+            "ai_model",
+            "captcha_timeout",
+            "otp_timeout",
+            "max_captcha_attempts",
+            "parallel_delay",
+            "screenshots_dir",
+            "credentials_file",
         }
         assert expected.issubset(field_names)
 

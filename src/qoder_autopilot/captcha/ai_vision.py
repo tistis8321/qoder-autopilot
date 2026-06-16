@@ -18,8 +18,8 @@ import json
 import re
 import time
 
-from .. import config
-from ..logger import log
+from ..infra import config
+from ..utils.logger import log
 
 
 async def gemini_detect_gap(page) -> float | None:

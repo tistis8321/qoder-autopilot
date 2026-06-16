@@ -1,6 +1,6 @@
 """Tests for OTP extraction module."""
 
-from qoder_autopilot.otp import extract_otp
+from qoder_autopilot.auth.otp import extract_otp
 
 
 class TestExtractOtp:

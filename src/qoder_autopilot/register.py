@@ -15,12 +15,12 @@ import asyncio
 import random
 import time
 
-from . import config
+from .auth.otp import extract_otp
 from .browser.window_tiler import tile_all_camoufox_windows
 from .captcha.solver import CaptchaSolver
-from .logger import log, log_err, log_ok, log_step
-from .otp import extract_otp
-from .temp_mail import TempMail
+from .infra import config
+from .infra.temp_mail import TempMail
+from .utils.logger import log, log_err, log_ok, log_step
 
 
 async def register_and_verify(

@@ -1,14 +1,11 @@
 """Tests for relay module."""
 
 import json
-import os
 import sqlite3
-import tempfile
-import uuid
 
 import pytest
 
-from qoder_autopilot.relay import (
+from qoder_autopilot.infra.relay import (
     _detect_9router_db,
     _insert_token_into_db,
     _load_or_create_token,
@@ -17,7 +14,6 @@ from qoder_autopilot.relay import (
     send_to_relay,
 )
 
-
 # ═══════════════════════════════════════════════════════════════════════════════
 # TOKEN PERSISTENCE
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -25,31 +21,25 @@ from qoder_autopilot.relay import (
 
 class TestTokenPersistence:
     def test_generate_new_token(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("qoder_autopilot.infra.relay.RELAY_CONFIG_DIR", tmp_path)
         monkeypatch.setattr(
-            "qoder_autopilot.relay.RELAY_CONFIG_DIR", tmp_path
-        )
-        monkeypatch.setattr(
-            "qoder_autopilot.relay.RELAY_CONFIG_FILE", tmp_path / "relay.json"
+            "qoder_autopilot.infra.relay.RELAY_CONFIG_FILE", tmp_path / "relay.json"
         )
         token = _load_or_create_token()
         assert len(token) > 20  # secrets.token_urlsafe(32) is ~43 chars
 
     def test_custom_token(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("qoder_autopilot.infra.relay.RELAY_CONFIG_DIR", tmp_path)
         monkeypatch.setattr(
-            "qoder_autopilot.relay.RELAY_CONFIG_DIR", tmp_path
-        )
-        monkeypatch.setattr(
-            "qoder_autopilot.relay.RELAY_CONFIG_FILE", tmp_path / "relay.json"
+            "qoder_autopilot.infra.relay.RELAY_CONFIG_FILE", tmp_path / "relay.json"
         )
         token = _load_or_create_token(custom_token="my-custom-token")
         assert token == "my-custom-token"
 
     def test_persist_and_reload(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("qoder_autopilot.infra.relay.RELAY_CONFIG_DIR", tmp_path)
         monkeypatch.setattr(
-            "qoder_autopilot.relay.RELAY_CONFIG_DIR", tmp_path
-        )
-        monkeypatch.setattr(
-            "qoder_autopilot.relay.RELAY_CONFIG_FILE", tmp_path / "relay.json"
+            "qoder_autopilot.infra.relay.RELAY_CONFIG_FILE", tmp_path / "relay.json"
         )
         # Generate first token
         token1 = _load_or_create_token()
@@ -59,12 +49,8 @@ class TestTokenPersistence:
 
     def test_save_token(self, tmp_path, monkeypatch):
         config_file = tmp_path / "relay.json"
-        monkeypatch.setattr(
-            "qoder_autopilot.relay.RELAY_CONFIG_DIR", tmp_path
-        )
-        monkeypatch.setattr(
-            "qoder_autopilot.relay.RELAY_CONFIG_FILE", config_file
-        )
+        monkeypatch.setattr("qoder_autopilot.infra.relay.RELAY_CONFIG_DIR", tmp_path)
+        monkeypatch.setattr("qoder_autopilot.infra.relay.RELAY_CONFIG_FILE", config_file)
         _save_token("test-token-123")
         assert config_file.exists()
         data = json.loads(config_file.read_text())
@@ -159,7 +145,7 @@ class TestInsertToken:
         assert r2["priority"] == r1["priority"] + 1
 
     def test_insert_missing_db(self, tmp_path):
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match=""):  # noqa: B017
             _insert_token_into_db(
                 str(tmp_path / "nonexistent.sqlite"),
                 "a@b.com",

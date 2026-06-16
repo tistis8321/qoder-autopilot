@@ -8,7 +8,7 @@ Includes variable speed, slight vertical wobble, and overshoot correction.
 import asyncio
 import random
 
-from ..logger import log
+from ..utils.logger import log
 
 
 async def slide_puzzle(

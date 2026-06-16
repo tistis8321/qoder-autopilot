@@ -17,7 +17,7 @@ import urllib.request
 
 import numpy as np
 
-from ..logger import log
+from ..utils.logger import log
 
 
 async def detect_gap_position(page) -> float | None:

@@ -8,8 +8,8 @@ in the visible browser window. Auto-detects when captcha disappears.
 import asyncio
 import time
 
-from .. import config
-from ..logger import log, log_err, log_ok
+from ..infra import config
+from ..utils.logger import log, log_err, log_ok
 
 
 async def handle_captcha_manual(page) -> bool:

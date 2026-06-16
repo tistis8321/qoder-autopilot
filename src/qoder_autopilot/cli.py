@@ -17,17 +17,17 @@ import random
 import signal
 import sys
 
-from . import config
+from .auth.credentials import save_creds
+from .auth.identity import gen_identity
+from .auth.oauth import initiate_device_flow, poll_device_token
 from .browser.camoufox import launch_browser, setup_page
 from .browser.window_tiler import get_screen_size
-from .credentials import save_creds
 from .errors import NineRouterDBNotFound, NineRouterError
-from .identity import gen_identity
-from .logger import log, log_debug, log_err, log_ok, log_warn, set_account_tag
-from .ninerouter import add_to_9router_device
-from .oauth import initiate_device_flow, poll_device_token
+from .infra import config
+from .infra.ninerouter import add_to_9router_device
+from .infra.temp_mail import TempMail
 from .register import register_and_verify
-from .temp_mail import TempMail
+from .utils.logger import log, log_debug, log_err, log_ok, log_warn, set_account_tag
 
 
 async def run_one(
@@ -227,7 +227,7 @@ async def main_async(args: argparse.Namespace) -> None:
         )
 
     # U4: Apply verbosity
-    from .logger import set_verbosity
+    from .utils.logger import set_verbosity
 
     if args.verbose:
         set_verbosity(2)
@@ -237,7 +237,7 @@ async def main_async(args: argparse.Namespace) -> None:
     # F6: Log file
     log_file_handle = None
     if args.log_file:
-        from .logger import set_log_file
+        from .utils.logger import set_log_file
 
         log_file_handle = set_log_file(args.log_file)
         log(f"📝 Logging to: {args.log_file}")
@@ -332,7 +332,7 @@ async def main_async(args: argparse.Namespace) -> None:
 
     # F6: Close log file
     if log_file_handle:
-        from .logger import close_log_file
+        from .utils.logger import close_log_file
 
         close_log_file()
         log(f"📝 Log saved to: {args.log_file}")
@@ -350,7 +350,7 @@ def main() -> None:
             return
 
         if sub == "deploy":
-            from .deploy import deploy_worker
+            from .setup.deploy import deploy_worker
 
             deploy_worker()
             return
@@ -360,13 +360,13 @@ def main() -> None:
             return
 
         if sub == "doctor":
-            from .doctor import run_doctor
+            from .setup.doctor import run_doctor
 
             run_doctor()
             return
 
     # ── First-run wizard ──
-    from .first_run import is_first_run, run_first_run_wizard
+    from .setup.first_run import is_first_run, run_first_run_wizard
 
     if is_first_run():
         if not run_first_run_wizard():
@@ -482,7 +482,7 @@ def main() -> None:
 
 def _handle_config_command(argv: list[str]) -> None:
     """Handle 'qoder-autopilot config' subcommands."""
-    from .user_config import (
+    from .infra.user_config import (
         CONFIG_FILE,
         USER_CONFIGURABLE,
         delete_user_config,
@@ -519,7 +519,7 @@ def _handle_config_command(argv: list[str]) -> None:
     if cmd == "show":
         cfg = load_user_config()
         # Also show defaults and env overrides
-        from .config import settings
+        from .infra.config import settings
 
         print(f"{'Setting':<25} {'Value':<50} {'Source':<10}")
         print("─" * 85)
@@ -627,7 +627,7 @@ def _handle_relay_command(argv: list[str]) -> None:
 
     args = parser.parse_args(argv)
 
-    from .relay import start_relay
+    from .infra.relay import start_relay
 
     start_relay(
         host=args.host,

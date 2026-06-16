@@ -7,7 +7,7 @@ Usage:
     Called automatically by cli.main() when no config exists.
 """
 
-from .user_config import CONFIG_FILE
+from ..infra.user_config import CONFIG_FILE
 
 BOLD = "\033[1m"
 GREEN = "\033[0;32m"

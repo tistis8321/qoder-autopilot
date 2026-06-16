@@ -16,8 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from . import config
-from .logger import log
+from ..infra import config
+from ..utils.logger import log
 
 
 def save_creds(data: dict[str, Any], path: Path | None = None) -> None:

@@ -3,7 +3,7 @@
 import base64
 import hashlib
 
-from qoder_autopilot.oauth import (
+from qoder_autopilot.auth.oauth import (
     base64url_encode,
     generate_pkce_pair,
     initiate_device_flow,
@@ -47,9 +47,7 @@ class TestGeneratePkcePair:
 
     def test_challenge_is_sha256_of_verifier(self):
         verifier, challenge = generate_pkce_pair()
-        expected = base64url_encode(
-            hashlib.sha256(verifier.encode()).digest()
-        )
+        expected = base64url_encode(hashlib.sha256(verifier.encode()).digest())
         assert challenge == expected
 
     def test_unique_each_time(self):
@@ -63,8 +61,12 @@ class TestInitiateDeviceFlow:
     def test_returns_all_keys(self):
         flow = initiate_device_flow()
         required_keys = {
-            "auth_url", "callback_url", "verifier",
-            "challenge", "nonce", "machine_id",
+            "auth_url",
+            "callback_url",
+            "verifier",
+            "challenge",
+            "nonce",
+            "machine_id",
         }
         assert set(flow.keys()) == required_keys
 

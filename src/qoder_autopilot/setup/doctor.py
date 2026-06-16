@@ -22,7 +22,7 @@ import shutil
 import subprocess
 import sys
 
-from . import config
+from ..infra import config
 
 BOLD = "\033[1m"
 GREEN = "\033[32m"
@@ -169,7 +169,7 @@ def run_doctor() -> None:
     if relay_url and relay_token:
         _info(f"URL: {relay_url}")
         try:
-            from .relay import check_relay_connection
+            from ..infra.relay import check_relay_connection
 
             if check_relay_connection(relay_url, relay_token):
                 _ok("Relay server reachable")

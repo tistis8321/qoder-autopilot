@@ -14,6 +14,7 @@ Quick start::
 
 __version__ = "0.6.0"
 
+from .auth.oauth import initiate_device_flow, poll_device_token
 from .captcha import CaptchaSolver
 from .cli import run_one
 from .errors import (
@@ -30,9 +31,8 @@ from .errors import (
     RegistrationError,
     TempMailError,
 )
-from .oauth import initiate_device_flow, poll_device_token
+from .infra.temp_mail import TempMail
 from .register import register_and_verify
-from .temp_mail import TempMail
 
 __all__ = [
     # Core functions

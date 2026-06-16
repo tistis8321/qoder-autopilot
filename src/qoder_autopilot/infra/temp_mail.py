@@ -25,9 +25,9 @@ from urllib.parse import quote as url_quote
 
 import requests
 
+from ..errors import TempMailError
+from ..utils.logger import log, log_err, log_ok
 from . import config
-from .errors import TempMailError
-from .logger import log, log_err, log_ok
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # BASE CLASS

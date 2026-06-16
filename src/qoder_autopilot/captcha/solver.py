@@ -17,8 +17,8 @@ import asyncio
 import random
 import time
 
-from .. import config
-from ..logger import log, log_err, log_ok
+from ..infra import config
+from ..utils.logger import log, log_err, log_ok
 from .ai_vision import gemini_detect_gap
 from .manual import handle_captcha_manual
 from .opencv_detect import detect_gap_position

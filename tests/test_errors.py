@@ -1,18 +1,18 @@
 """Tests for custom exceptions module."""
 
 from qoder_autopilot.errors import (
-    QoderAutopilotError,
-    TempMailError,
+    CaptchaAIFailed,
     CaptchaError,
     CaptchaTimeoutError,
-    CaptchaAIFailed,
-    RegistrationError,
-    OTPTimeoutError,
-    FormSubmitError,
-    OAuthError,
     DeviceTokenTimeout,
-    NineRouterError,
+    FormSubmitError,
     NineRouterDBNotFound,
+    NineRouterError,
+    OAuthError,
+    OTPTimeoutError,
+    QoderAutopilotError,
+    RegistrationError,
+    TempMailError,
 )
 
 
@@ -21,10 +21,17 @@ class TestExceptionHierarchy:
 
     def test_all_inherit_base(self):
         exceptions = [
-            TempMailError, CaptchaError, CaptchaTimeoutError,
-            CaptchaAIFailed, RegistrationError, OTPTimeoutError,
-            FormSubmitError, OAuthError, DeviceTokenTimeout,
-            NineRouterError, NineRouterDBNotFound,
+            TempMailError,
+            CaptchaError,
+            CaptchaTimeoutError,
+            CaptchaAIFailed,
+            RegistrationError,
+            OTPTimeoutError,
+            FormSubmitError,
+            OAuthError,
+            DeviceTokenTimeout,
+            NineRouterError,
+            NineRouterDBNotFound,
         ]
         for exc_class in exceptions:
             assert issubclass(exc_class, QoderAutopilotError)

@@ -1,6 +1,6 @@
 """Tests for identity generation module."""
 
-from qoder_autopilot.identity import gen_identity, gen_password
+from qoder_autopilot.auth.identity import gen_identity, gen_password
 
 
 class TestGenPassword:

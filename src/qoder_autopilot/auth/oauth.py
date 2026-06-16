@@ -22,8 +22,8 @@ from urllib.parse import urlencode
 
 import requests
 
-from . import config
-from .logger import log, log_err, log_ok
+from ..infra import config
+from ..utils.logger import log, log_err, log_ok
 
 
 def base64url_encode(data: bytes) -> str:

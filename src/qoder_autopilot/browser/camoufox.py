@@ -9,7 +9,7 @@ import random
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from ..logger import log
+from ..utils.logger import log
 
 
 @asynccontextmanager

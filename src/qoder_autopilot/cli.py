@@ -243,10 +243,30 @@ def main() -> None:
         set_user_config_value, USER_CONFIGURABLE, CONFIG_FILE,
     )
 
-    # ── Quick check for 'config' subcommand before full argparse ──
-    if len(sys.argv) > 1 and sys.argv[1] == "config":
-        _handle_config_command(sys.argv[2:])
-        return
+    # ── Quick check for subcommands before full argparse ──
+    if len(sys.argv) > 1:
+        sub = sys.argv[1]
+
+        if sub == "config":
+            _handle_config_command(sys.argv[2:])
+            return
+
+        if sub == "deploy":
+            from .deploy import deploy_worker
+            deploy_worker()
+            return
+
+    # ── First-run wizard ──
+    from .first_run import is_first_run, run_first_run_wizard
+    if is_first_run():
+        if not run_first_run_wizard():
+            return
+        # After wizard, continue to main flow (user can run with args)
+        # If no args besides the program name, exit gracefully
+        if len(sys.argv) <= 1:
+            print("  Run with --help to see available options:")
+            print("  qoder-autopilot -n 3 --manual-captcha")
+            return
 
     # ── Main registration arguments ──
     p = argparse.ArgumentParser(

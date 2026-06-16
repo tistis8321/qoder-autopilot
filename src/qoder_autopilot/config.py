@@ -63,10 +63,18 @@ class Settings(BaseSettings):
             return {}
 
     def __init__(self, **data):
-        # Inject user config as base values (env vars still override)
+        # Inject user config as base values, but don't override env vars or explicit kwargs
         user_cfg = self._load_user_config()
-        merged = {**user_cfg, **data}
-        super().__init__(**merged)
+        for key, value in user_cfg.items():
+            # Skip if explicit kwarg provided
+            if key in data:
+                continue
+            # Skip if env var is set (env vars have priority over user config)
+            env_key = f"QODER_{key.upper()}"
+            if os.environ.get(env_key):
+                continue
+            data[key] = value
+        super().__init__(**data)
 
     # ── Temp Mail ─────────────────────────────────────────────────────────
     mail_provider: str = Field(

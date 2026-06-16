@@ -1,27 +1,19 @@
 """
 Qoder Autopilot — Configuration (pydantic-settings)
 =====================================================
-All settings are loaded from environment variables with sensible defaults.
-Supports .env file, QODER_ prefix, and backward-compatible aliases.
+Settings loaded with priority chain (highest → lowest):
+    1. Environment variables (QODER_*, .env)
+    2. User config (~/.qoder-autopilot/config.json)
+    3. Built-in defaults
 
 Usage:
     from qoder_autopilot.config import settings      # Settings singleton
     from qoder_autopilot.config import WORKER_URL     # Module-level re-exports
 
-Environment variables:
-    QODER_WORKER_URL        → settings.worker_url
-    QODER_AI_API_KEY        → settings.ai_api_key      (alias: SUMOPOD_API_KEY)
-    QODER_AI_BASE_URL       → settings.ai_base_url     (alias: SUMOPOD_BASE_URL)
-    QODE... → settings.ai_model          (alias: SUMOPOD_MODEL)
-    QODER_NINEROUTER_DB     → settings.ninerouter_db
-    QODER_NINEROUTER_URL    → settings.ninerouter_url
-    QODER_NINEROUTER_PASSWORD → settings.ninerouter_password
-    QODER_CAPTCHA_TIMEOUT   → settings.captcha_timeout
-    QODER_OTP_TIMEOUT       → settings.otp_timeout
-    QODER_MAX_CAPTCHA_ATTEMPTS → settings.max_captcha_attempts
-    QODER_PARALLEL_DELAY    → settings.parallel_delay
-    QODER_SCREENSHOTS_DIR   → settings.screenshots_dir
-    QODER_CREDENTIALS_FILE  → settings.credentials_file
+CLI configuration:
+    qoder-autopilot config show                       # Show all settings
+    qoder-autopilot config set worker-url https://...  # Set a value
+    qoder-autopilot config reset                       # Reset to defaults
 """
 
 import os
@@ -29,6 +21,8 @@ from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from .user_config import load_user_config, USER_CONFIGURABLE
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -59,6 +53,20 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
     )
+
+    @classmethod
+    def _load_user_config(cls) -> dict:
+        """Load user config from ~/.qoder-autopilot/config.json."""
+        try:
+            return load_user_config()
+        except Exception:
+            return {}
+
+    def __init__(self, **data):
+        # Inject user config as base values (env vars still override)
+        user_cfg = self._load_user_config()
+        merged = {**user_cfg, **data}
+        super().__init__(**merged)
 
     # ── Temp Mail ─────────────────────────────────────────────────────────
     worker_url: str = Field(

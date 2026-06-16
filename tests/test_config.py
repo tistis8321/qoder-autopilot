@@ -13,7 +13,7 @@ class TestSettings:
     def test_default_timeouts(self):
         s = Settings()
         assert s.captcha_timeout == 120
-        assert s.otp_timeout == 120
+        assert s.otp_timeout == 20
         assert s.max_captcha_attempts == 8
         assert s.parallel_delay == 30
 

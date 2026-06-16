@@ -11,7 +11,8 @@ Usage:
 
 import argparse
 import asyncio
-import platform
+import os
+import sys
 import random
 
 from . import config
@@ -236,7 +237,18 @@ async def main_async(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    """CLI entry point."""
+    """CLI entry point with config management subcommand."""
+    from .user_config import (
+        load_user_config, save_user_config, delete_user_config,
+        set_user_config_value, USER_CONFIGURABLE, CONFIG_FILE,
+    )
+
+    # ── Quick check for 'config' subcommand before full argparse ──
+    if len(sys.argv) > 1 and sys.argv[1] == "config":
+        _handle_config_command(sys.argv[2:])
+        return
+
+    # ── Main registration arguments ──
     p = argparse.ArgumentParser(
         prog="qoder-autopilot",
         description="Automated Qoder account registration with 9Router integration",
@@ -268,3 +280,91 @@ def main() -> None:
     args = p.parse_args()
 
     asyncio.run(main_async(args))
+
+
+def _handle_config_command(argv: list[str]) -> None:
+    """Handle 'qoder-autopilot config' subcommands."""
+    from .user_config import (
+        load_user_config, save_user_config, delete_user_config,
+        set_user_config_value, USER_CONFIGURABLE, CONFIG_FILE,
+    )
+
+    if not argv or argv[0] in ("-h", "--help"):
+        print("Usage: qoder-autopilot config <command> [args]")
+        print()
+        print("Commands:")
+        print("  show                    Show all current settings")
+        print("  set <key> <value>       Set a config value")
+        print("  get <key>               Get a config value")
+        print("  reset                   Reset all settings to defaults")
+        print()
+        print("Configurable keys:")
+        for key, info in USER_CONFIGURABLE.items():
+            cli = info["cli_flag"]
+            print(f"  {cli:20s} {info['description']}")
+        print()
+        print(f"Config file: {CONFIG_FILE}")
+        return
+
+    cmd = argv[0]
+
+    if cmd == "show":
+        cfg = load_user_config()
+        # Also show defaults and env overrides
+        from .config import settings
+        print(f"{'Setting':<25} {'Value':<50} {'Source':<10}")
+        print("─" * 85)
+        for key, info in USER_CONFIGURABLE.items():
+            env_val = os.environ.get(f"QODER_{key.upper()}", "")
+            current = getattr(settings, key, None)
+            if env_val:
+                source = "env"
+            elif key in cfg:
+                source = "config"
+            else:
+                source = "default"
+            val_str = str(current) if current else "(empty)"
+            if key.endswith("api_key") and val_str and val_str != "(empty)":
+                val_str = val_str[:8] + "..." + val_str[-4:] if len(val_str) > 12 else "***"
+            print(f"  {info['cli_flag']:<23} {val_str:<50} {source}")
+        print()
+        print(f"Config file: {CONFIG_FILE}")
+
+    elif cmd == "set" and len(argv) >= 3:
+        cli_flag = argv[1]
+        value = argv[2]
+        # Map CLI flag to config key
+        key_map = {info["cli_flag"]: key for key, info in USER_CONFIGURABLE.items()}
+        key = key_map.get(cli_flag)
+        if not key:
+            print(f"❌ Unknown key: {cli_flag}")
+            print(f"Available: {', '.join(key_map.keys())}")
+            sys.exit(1)
+        if set_user_config_value(key, value):
+            print(f"✅ {cli_flag} = {value}")
+            print(f"   Saved to {CONFIG_FILE}")
+        else:
+            print(f"❌ Failed to set {cli_flag} (invalid value?)")
+            sys.exit(1)
+
+    elif cmd == "get" and len(argv) >= 2:
+        cli_flag = argv[1]
+        key_map = {info["cli_flag"]: key for key, info in USER_CONFIGURABLE.items()}
+        key = key_map.get(cli_flag)
+        if not key:
+            print(f"❌ Unknown key: {cli_flag}")
+            sys.exit(1)
+        cfg = load_user_config()
+        val = cfg.get(key, "(not set)")
+        print(f"{cli_flag} = {val}")
+
+    elif cmd == "reset":
+        if delete_user_config():
+            print(f"✅ Config reset — deleted {CONFIG_FILE}")
+        else:
+            print("ℹ️  No config file to delete")
+
+    else:
+        print(f"❌ Unknown command: {cmd}")
+        print("Run 'qoder-autopilot config --help' for usage")
+        sys.exit(1)

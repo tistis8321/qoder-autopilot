@@ -274,7 +274,7 @@ def deploy_worker() -> None:
 
     # Step 3: Extract template
     print()
-    work_dir = Path(tempfile.mkdtemp(prefix="qoder-mail-worker-"))
+    work_dir = Path(tempfile.mkdtemp(prefix="cf-mail-worker-"))
     log("Extracting worker template...")
     if not extract_template(work_dir):
         sys.exit(1)

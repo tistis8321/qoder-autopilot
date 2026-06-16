@@ -191,13 +191,13 @@ Want your own independent temp mail service? Deploy in 5 minutes:
 qoder-autopilot deploy
 
 # Or clone the standalone repo
-git clone https://github.com/Daivageralda/qoder-mail-worker.git
-cd qoder-mail-worker
+git clone https://github.com/Daivageralda/cf-mail-worker.git
+cd cf-mail-worker
 npm install
 npm run setup
 ```
 
-See [qoder-mail-worker](https://github.com/Daivageralda/qoder-mail-worker) for full documentation.
+See [cf-mail-worker](https://github.com/Daivageralda/cf-mail-worker) for full documentation.
 
 ## 🏗️ Architecture
 
@@ -237,7 +237,7 @@ qoder-autopilot/
 
 ## 🔗 Related
 
-- [**qoder-mail-worker**](https://github.com/Daivageralda/qoder-mail-worker) — Self-hosted temp mail API (Cloudflare Workers + D1)
+- [**cf-mail-worker**](https://github.com/Daivageralda/cf-mail-worker) — Self-hosted temp mail API (Cloudflare Workers + D1)
 - [**bulk-temp-mail**](https://github.com/Daivageralda/temp-mail-generator) — Full temp mail service with React frontend
 
 ## 📄 License

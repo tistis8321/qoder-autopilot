@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# qoder-mail-worker — Interactive Setup Wizard
+# cf-mail-worker — Interactive Setup Wizard
 # ═══════════════════════════════════════════════════════════════════════════════
 # Usage: npm run setup  (or: bash scripts/setup.sh)
 #
@@ -29,7 +29,7 @@ warn() { echo -e "${YELLOW}  ⚠️  $1${NC}"; }
 err()  { echo -e "${RED}  ❌ $1${NC}"; }
 
 echo ""
-echo -e "${BOLD}  📦 qoder-mail-worker — Setup Wizard${NC}"
+echo -e "${BOLD}  📦 cf-mail-worker — Setup Wizard${NC}"
 echo "  ────────────────────────────────────"
 echo ""
 
@@ -58,8 +58,8 @@ fi
 # ─── Step 2: Collect config ──────────────────────────────────────────────────
 
 echo ""
-read -rp "$(echo -e "${BOLD}  [?] Worker name${NC} (default: qoder-mail-worker): ")" WORKER_NAME
-WORKER_NAME="${WORKER_NAME:-qoder-mail-worker}"
+read -rp "$(echo -e "${BOLD}  [?] Worker name${NC} (default: cf-mail-worker): ")" WORKER_NAME
+WORKER_NAME="${WORKER_NAME:-cf-mail-worker}"
 
 read -rp "$(echo -e "${BOLD}  [?] Domain${NC} (your email domain, e.g. mydomain.com): ")" DOMAIN
 if [ -z "$DOMAIN" ]; then

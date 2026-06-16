@@ -1,5 +1,5 @@
 {
-  "name": "qoder-mail-worker",
+  "name": "cf-mail-worker",
   "version": "1.0.0",
   "description": "Self-hosted temporary email API on Cloudflare Workers + D1",
   "type": "module",

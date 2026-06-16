@@ -327,7 +327,7 @@ def _handle_config_command(argv: list[str]) -> None:
         print()
         print("─── Self-Host Your Own Temp Mail Worker ───")
         print("  Deploy your own Cloudflare Worker in 5 minutes:")
-        print("  https://github.com/Daivageralda/qoder-mail-worker")
+        print("  https://github.com/Daivageralda/cf-mail-worker")
         print()
         print("  Then point qoder-autopilot to it:")
         print("  qoder-autopilot config set worker-url https://your-worker.workers.dev")
@@ -358,7 +358,7 @@ def _handle_config_command(argv: list[str]) -> None:
         print(f"Config file: {CONFIG_FILE}")
         print()
         print("💡 Want to self-host your own temp mail worker?")
-        print("   → https://github.com/Daivageralda/qoder-mail-worker")
+        print("   → https://github.com/Daivageralda/cf-mail-worker")
 
     elif cmd == "set":
         if len(argv) < 3:

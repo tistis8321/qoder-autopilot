@@ -44,23 +44,15 @@ async def launch_browser(
 async def setup_page(page) -> None:
     """Apply standard page setup for stealth and stability.
 
-    - Suppresses uncaught JS errors from target sites
     - Forces 100% zoom on every page load
-    - Sets a fixed viewport for consistent rendering
+
+    Note: pageerror listener intentionally omitted — Playwright's internal
+    handler crashes on Node.js v24+ when pageError.location is undefined.
+    Adding our own listener doesn't prevent the internal crash.
 
     Args:
         page: Playwright/Camoufox page object.
     """
-    from ..logger import log as _log
-
-    # Suppress uncaught JS errors from target pages
-    page.on(
-        "pageerror",
-        lambda err: _log(f"⚠️ Page JS error (suppressed): {err}", "WARN"),
-    )
-
-    # Set fixed viewport — ensures form elements are always accessible
-    await page.set_viewport_size({"width": 1024, "height": 768})
 
     # Force 100% zoom on every page load
     await page.add_init_script("""() => {

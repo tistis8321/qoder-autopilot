@@ -74,6 +74,15 @@ async def register_and_verify(
                     }
                 }""")
             await asyncio.sleep(1)
+
+            # Verify we're on sign-up page, if not navigate directly
+            current_url = page.url
+            if "sign-up" not in current_url:
+                log("   ⚠️ Still on sign-in page — navigating directly to sign-up...")
+                # Swap sign-in → sign-up in the URL, preserve all params
+                signup_url = auth_url.replace("/users/sign-in", "/users/sign-up")
+                await page.goto(signup_url, wait_until="networkidle", timeout=30000)
+                await asyncio.sleep(0.5)
         else:
             log_step(1, 7, "Opening Qoder sign-up...")
             await page.goto(

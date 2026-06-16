@@ -24,9 +24,24 @@ CONFIG_FILE = CONFIG_DIR / "config.json"
 
 # Keys that users can configure + their descriptions
 USER_CONFIGURABLE = {
+    "mail_provider": {
+        "description": "Temp mail provider: 'cloudflare' or 'moca'",
+        "cli_flag": "mail-provider",
+        "type": "str",
+    },
     "worker_url": {
         "description": "Cloudflare Worker URL for temp email",
         "cli_flag": "worker-url",
+        "type": "str",
+    },
+    "moca_api_key": {
+        "description": "Moca Supabase temp mail API key (tmk_xxx)",
+        "cli_flag": "moca-api-key",
+        "type": "str",
+    },
+    "moca_base_url": {
+        "description": "Moca Supabase temp mail base URL",
+        "cli_flag": "moca-base-url",
         "type": "str",
     },
     "ai_api_key": {

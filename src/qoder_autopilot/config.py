@@ -69,12 +69,24 @@ class Settings(BaseSettings):
         super().__init__(**merged)
 
     # ── Temp Mail ─────────────────────────────────────────────────────────
+    mail_provider: str = Field(
+        default="cloudflare",
+        description="Temp mail provider: 'cloudflare' or 'moca'",
+    )
     worker_url: str = Field(
         default=os.environ.get(
             "WORKER_URL",
             "https://hanzzcreator-mail.daivageralda831.workers.dev",
         ),
         description="Cloudflare Worker URL for temporary email generation",
+    )
+    moca_api_key: str = Field(
+        default="",
+        description="Moca Supabase temp mail API key (tmk_xxx)",
+    )
+    moca_base_url: str = Field(
+        default="https://ijrccpgiulrmfpavazsl.supabase.co/functions/v1/temp-mail-api",
+        description="Moca Supabase temp mail base URL",
     )
 
     # ── Qoder URLs (constants, rarely need override) ──────────────────────
@@ -185,7 +197,10 @@ settings = Settings()
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Temp Mail
+MAIL_PROVIDER = settings.mail_provider
 WORKER_URL = settings.worker_url
+MOCA_API_KEY = settings.moca_api_key
+MOCA_BASE_URL = settings.moca_base_url
 
 # Qoder URLs
 QODER_SIGNUP_URL = settings.qoder_signup_url

@@ -329,7 +329,7 @@ async def register_and_verify(
                             break
             except Exception as e:
                 log(f"   ⚠️ Inbox fetch error (will retry): {e}")
-            await asyncio.sleep(5)
+            await asyncio.sleep(2)
 
         if not otp:
             log_err(f"OTP not received within {config.OTP_TIMEOUT}s")

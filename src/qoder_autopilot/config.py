@@ -125,8 +125,7 @@ class Settings(BaseSettings):
         description="Max seconds to wait for manual captcha solve",
     )
     otp_timeout: int = Field(
-        default=120,
-        description="Max seconds to wait for OTP email",
+        default=20, description="Max seconds to wait for OTP email"
     )
     max_captcha_attempts: int = Field(
         default=8,

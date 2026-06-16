@@ -294,6 +294,19 @@ def main() -> None:
     p = argparse.ArgumentParser(
         prog="qoder-autopilot",
         description="Automated Qoder account registration with 9Router integration",
+        epilog=(
+            "subcommands:\n"
+            "  doctor           🩺 Health check — verify dependencies & configs\n"
+            "  deploy           Deploy your own temp mail Cloudflare Worker\n"
+            "  relay            Start relay server for remote 9Router\n"
+            "  config           Manage configuration (show/set/get/reset)\n"
+            "\n"
+            "examples:\n"
+            "  qoder-autopilot -n 3 --manual-captcha\n"
+            "  qoder-autopilot doctor\n"
+            "  qoder-autopilot relay --port 9999\n"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument(
         "-n",

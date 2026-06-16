@@ -12,7 +12,7 @@ Quick start::
     result = asyncio.run(run_one(manual_captcha=True))
 """
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 from .captcha import CaptchaSolver
 from .cli import run_one

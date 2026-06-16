@@ -30,26 +30,26 @@ RED = "\033[31m"
 YELLOW = "\033[33m"
 NC = "\033[0m"
 
-_pass = 0
-_fail = 0
-_warn = 0
+_n_pass = 0
+_n_fail = 0
+_n_warn = 0
 
 
 def _ok(msg: str) -> None:
-    global _pass  # noqa: PLW0603
-    _pass += 1
+    global _n_pass  # noqa: PLW0603
+    _n_pass += 1
     print(f"  {GREEN}✅{NC} {msg}")
 
 
 def _fail(msg: str) -> None:
-    global _fail  # noqa: PLW0603
-    _fail += 1
+    global _n_fail  # noqa: PLW0603
+    _n_fail += 1
     print(f"  {RED}❌{NC} {msg}")
 
 
 def _warn(msg: str) -> None:
-    global _warn  # noqa: PLW0603
-    _warn += 1
+    global _n_warn  # noqa: PLW0603
+    _n_warn += 1
     print(f"  {YELLOW}⚠️{NC}  {msg}")
 
 
@@ -59,8 +59,8 @@ def _info(msg: str) -> None:
 
 def run_doctor() -> None:
     """Run all health checks and print results."""
-    global _pass, _fail, _warn  # noqa: PLW0603
-    _pass = _fail = _warn = 0
+    global _n_pass, _n_fail, _n_warn  # noqa: PLW0603
+    _n_pass = _n_fail = _n_warn = 0
 
     print()
     print(f"  {BOLD}🩺 qoder-autopilot doctor{NC}")
@@ -82,7 +82,13 @@ def run_doctor() -> None:
     try:
         import camoufox  # noqa: F401
 
-        _ok(f"camoufox {getattr(camoufox, '__version__', 'installed')}")
+        try:
+            from importlib.metadata import version as _pkg_ver
+
+            cfx_ver = _pkg_ver("camoufox")
+        except Exception:
+            cfx_ver = "installed"
+        _ok(f"camoufox {cfx_ver}")
     except ImportError:
         _fail("camoufox not installed — pip install camoufox")
 
@@ -203,13 +209,15 @@ def run_doctor() -> None:
 
     # Summary
     print(f"  {'─' * 44}")
-    print(f"  {GREEN}{_pass} passed{NC}  {YELLOW}{_warn} warnings{NC}  {RED}{_fail} failed{NC}")
+    print(
+        f"  {GREEN}{_n_pass} passed{NC}  {YELLOW}{_n_warn} warnings{NC}  {RED}{_n_fail} failed{NC}"
+    )
     print()
 
-    if _fail > 0:
+    if _n_fail > 0:
         print(f"  {RED}Some checks failed. Fix them before running registrations.{NC}")
         print()
-    elif _warn > 0:
+    elif _n_warn > 0:
         print(f"  {YELLOW}Warnings found but core functionality should work.{NC}")
         print()
     else:

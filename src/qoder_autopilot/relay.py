@@ -139,40 +139,43 @@ def _insert_token_into_db(
     if not expires_at:
         expires_at = (datetime.now(timezone.utc) + timedelta(seconds=expires_in)).isoformat()
 
-    conn = sqlite3.connect(db_path)
-    c = conn.cursor()
+    with sqlite3.connect(db_path, timeout=10) as conn:
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA busy_timeout=5000")
+        c = conn.cursor()
 
-    # Get next priority
-    c.execute("SELECT COALESCE(MAX(priority),0)+1 FROM providerConnections WHERE provider='qoder'")
-    prio = c.fetchone()[0]
+        # Get next priority
+        c.execute(
+            "SELECT COALESCE(MAX(priority),0)+1 FROM providerConnections WHERE provider='qoder'"
+        )
+        prio = c.fetchone()[0]
 
-    data = json.dumps(
-        {
-            "displayName": display_name,
-            "accessToken": at,
-            "refreshToken": rt,
-            "expiresAt": expires_at,
-            "testStatus": "active",
-            "expiresIn": expires_in,
-            "providerSpecificData": {
-                "authMethod": "device",
-                "userId": user_id,
-                "machineId": machine_id,
-                "organizationId": "",
-            },
-        }
-    )
+        data = json.dumps(
+            {
+                "displayName": display_name,
+                "accessToken": at,
+                "refreshToken": rt,
+                "expiresAt": expires_at,
+                "testStatus": "active",
+                "expiresIn": expires_in,
+                "providerSpecificData": {
+                    "authMethod": "device",
+                    "userId": user_id,
+                    "machineId": machine_id,
+                    "organizationId": "",
+                },
+            }
+        )
 
-    now = datetime.now(timezone.utc).isoformat()
-    c.execute(
-        """INSERT INTO providerConnections
-        (id, provider, authType, name, email, priority, isActive, data,
-         createdAt, updatedAt)
-        VALUES (?, 'qoder', 'oauth', ?, ?, ?, 1, ?, ?, ?)""",
-        (str(uuid.uuid4()), display_name, email, prio, data, now, now),
-    )
-    conn.commit()
-    conn.close()
+        now = datetime.now(timezone.utc).isoformat()
+        c.execute(
+            """INSERT INTO providerConnections
+            (id, provider, authType, name, email, priority, isActive, data,
+             createdAt, updatedAt)
+            VALUES (?, 'qoder', 'oauth', ?, ?, ?, 1, ?, ?, ?)""",
+            (str(uuid.uuid4()), display_name, email, prio, data, now, now),
+        )
+        conn.commit()
 
     return {"priority": prio, "id": str(uuid.uuid4())}
 
@@ -273,6 +276,7 @@ def start_relay(
         import uvicorn
         from fastapi import Depends, FastAPI, HTTPException, Request
         from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+        from pydantic import BaseModel, EmailStr, constr
     except ImportError:
         print("❌ Relay dependencies not installed.")
         print()
@@ -328,9 +332,16 @@ def start_relay(
             "version": "1.1.0",
         }
 
+    # ── Pydantic validation model ──
+    class InsertPayload(BaseModel):
+        email: EmailStr
+        display_name: constr(min_length=1, max_length=200)  # type: ignore[valid-type]
+        device_token_body: dict
+        machine_id: constr(min_length=1, max_length=200)  # type: ignore[valid-type]
+
     @app.post("/insert-token")
     async def insert_token(
-        payload: dict,
+        payload: InsertPayload,
         request: Request,
         _: str = Depends(verify_token),
     ):
@@ -340,14 +351,6 @@ def start_relay(
             raise HTTPException(
                 status_code=429,
                 detail=f"Rate limited ({RATE_LIMIT_MAX} req/{RATE_LIMIT_WINDOW}s)",
-            )
-        # Validate required fields
-        required = ["email", "display_name", "device_token_body", "machine_id"]
-        missing = [f for f in required if f not in payload]
-        if missing:
-            raise HTTPException(
-                status_code=422,
-                detail=f"Missing fields: {', '.join(missing)}",
             )
 
         if not os.path.exists(db_path):
@@ -359,15 +362,15 @@ def start_relay(
         try:
             result = _insert_token_into_db(
                 db_path,
-                email=payload["email"],
-                display_name=payload["display_name"],
-                device_token_body=payload["device_token_body"],
-                machine_id=payload["machine_id"],
+                email=payload.email,
+                display_name=payload.display_name,
+                device_token_body=payload.device_token_body,
+                machine_id=payload.machine_id,
             )
             return {
                 "status": "ok",
                 "priority": result["priority"],
-                "message": f"Token inserted for {payload['email']}",
+                "message": f"Token inserted for {payload.email}",
             }
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"DB insert failed: {e}") from e

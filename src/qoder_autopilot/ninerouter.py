@@ -78,42 +78,43 @@ def add_to_9router_device(
         if not expires_at:
             expires_at = (datetime.now(timezone.utc) + timedelta(seconds=expires_in)).isoformat()
 
-        conn = sqlite3.connect(db)
-        c = conn.cursor()
+        with sqlite3.connect(db, timeout=10) as conn:
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA busy_timeout=5000")
+            c = conn.cursor()
 
-        # Get next priority
-        c.execute(
-            "SELECT COALESCE(MAX(priority),0)+1 FROM providerConnections WHERE provider='qoder'"
-        )
-        prio = c.fetchone()[0]
+            # Get next priority
+            c.execute(
+                "SELECT COALESCE(MAX(priority),0)+1 FROM providerConnections WHERE provider='qoder'"
+            )
+            prio = c.fetchone()[0]
 
-        data = json.dumps(
-            {
-                "displayName": display_name,
-                "accessToken": at,
-                "refreshToken": rt,
-                "expiresAt": expires_at,
-                "testStatus": "active",
-                "expiresIn": expires_in,
-                "providerSpecificData": {
-                    "authMethod": "device",
-                    "userId": user_id,
-                    "machineId": machine_id,
-                    "organizationId": "",
-                },
-            }
-        )
+            data = json.dumps(
+                {
+                    "displayName": display_name,
+                    "accessToken": at,
+                    "refreshToken": rt,
+                    "expiresAt": expires_at,
+                    "testStatus": "active",
+                    "expiresIn": expires_in,
+                    "providerSpecificData": {
+                        "authMethod": "device",
+                        "userId": user_id,
+                        "machineId": machine_id,
+                        "organizationId": "",
+                    },
+                }
+            )
 
-        now = datetime.now(timezone.utc).isoformat()
-        c.execute(
-            """INSERT INTO providerConnections
-            (id, provider, authType, name, email, priority, isActive, data,
-             createdAt, updatedAt)
-            VALUES (?, 'qoder', 'oauth', ?, ?, ?, 1, ?, ?, ?)""",
-            (str(uuid.uuid4()), display_name, email, prio, data, now, now),
-        )
-        conn.commit()
-        conn.close()
+            now = datetime.now(timezone.utc).isoformat()
+            c.execute(
+                """INSERT INTO providerConnections
+                (id, provider, authType, name, email, priority, isActive, data,
+                 createdAt, updatedAt)
+                VALUES (?, 'qoder', 'oauth', ?, ?, ?, 1, ?, ?, ?)""",
+                (str(uuid.uuid4()), display_name, email, prio, data, now, now),
+            )
+            conn.commit()
 
         log_ok(f"Added to 9Router as #{prio} (device token)")
         return True

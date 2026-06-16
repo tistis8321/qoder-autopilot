@@ -57,6 +57,11 @@ def run_first_run_wizard() -> bool:
             print()
             print(f"  {GREEN}✅ Quick Start selected! Using default worker.{NC}")
             print()
+            print(f"  {YELLOW}⚠️  NOTICE:{NC} Quick Start uses a {BOLD}shared public worker{NC}")
+            print(f"  {DIM}operated by the package maintainer. All temp email traffic{NC}")
+            print(f"  {DIM}(including OTP codes) passes through this service.{NC}")
+            print(f"  {DIM}For production use, we strongly recommend self-hosting.{NC}")
+            print()
             _mark_configured()
             return True
 

@@ -127,11 +127,12 @@ async def run_one(
     # 4. Poll for device token + connect to 9Router
     if flow:
         log("📋 Step 4/4: Polling device token...")
-        device_token = poll_device_token(
+        device_token = await asyncio.to_thread(
+            poll_device_token,
             flow["nonce"],
             flow["verifier"],
-            max_attempts=60,
-            interval=3,
+            60,
+            3,
         )
 
         if device_token:
@@ -268,6 +269,12 @@ def main() -> None:
 
         if sub == "relay":
             _handle_relay_command(sys.argv[2:])
+            return
+
+        if sub == "doctor":
+            from .doctor import run_doctor
+
+            run_doctor()
             return
 
     # ── First-run wizard ──

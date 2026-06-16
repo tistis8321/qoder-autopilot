@@ -121,7 +121,9 @@ qoder-autopilot -n 3 --manual-captcha --delay 60
 |---|---|
 | `qoder-autopilot` | First-run wizard (no config) or start registration |
 | `qoder-autopilot [options]` | Register accounts (see flags below) |
+| `qoder-autopilot doctor` | 🩺 Health check — verify all dependencies & configs |
 | `qoder-autopilot deploy` | Deploy your own temp mail worker |
+| `qoder-autopilot relay` | Start relay server for remote 9Router |
 | `qoder-autopilot config` | Show config help + available keys |
 | `qoder-autopilot config show` | Show all current settings with source |
 | `qoder-autopilot config get <key>` | Get a specific config value |
@@ -255,14 +257,18 @@ qoder-autopilot takes security seriously:
 - **Credential files** — `qoder_accounts.json` saved with `chmod 600` (owner-only)
 - **Config files** — `~/.qoder-autopilot/config.json` and `relay.json` restricted to `600`
 - **Password masking** — passwords never logged to stdout (masked as `••••••••`)
+- **API key masking** — AI API keys never shown in logs (shown as `***configured***`)
 - **Sensitive field masking** — `config show` masks API keys, tokens, and passwords
 - **File locking** — concurrent credential writes are atomic (safe in `--parallel` mode)
 - **Timing-safe auth** — relay token comparison uses `hmac.compare_digest()`
 - **Rate limiting** — relay server limits to 30 requests/60s per IP
+- **Input validation** — relay validates email format and field lengths via Pydantic
+- **SQLite WAL mode** — safe concurrent access with `busy_timeout` (no connection leaks)
 - **Secure default binding** — relay defaults to `127.0.0.1` (localhost only)
 - **HTTPS warning** — startup warns when relay runs without TLS
+- **Trust transparency** — first-run wizard warns about shared public worker
 
-> **Recommendation:** For production relay deployments, always use a reverse proxy with HTTPS (nginx/caddy) or an SSH tunnel.
+> **Recommendation:** For production use, always self-host your temp mail worker and use HTTPS (nginx/caddy) or SSH tunnel for relay.
 
 ## 🔗 Related
 

@@ -45,7 +45,7 @@ async def gemini_detect_gap(page) -> float | None:
             return None
 
         model = config.AI_MODEL
-        log(f"   🤖 Using model: {model}, API key: {api_key[:8]}...")
+        log(f"   🤖 Using model: {model}, API key: ***configured***")
         client = OpenAI(api_key=api_key, base_url=config.AI_BASE_URL)
 
         # ─── Get image data + puzzle piece position from page ───

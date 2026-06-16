@@ -46,6 +46,7 @@ async def setup_page(page) -> None:
 
     - Suppresses uncaught JS errors from target sites
     - Forces 100% zoom on every page load
+    - Sets a fixed viewport for consistent rendering
 
     Args:
         page: Playwright/Camoufox page object.
@@ -57,6 +58,9 @@ async def setup_page(page) -> None:
         "pageerror",
         lambda err: _log(f"⚠️ Page JS error (suppressed): {err}", "WARN"),
     )
+
+    # Set fixed viewport — ensures form elements are always accessible
+    await page.set_viewport_size({"width": 1024, "height": 768})
 
     # Force 100% zoom on every page load
     await page.add_init_script("""() => {

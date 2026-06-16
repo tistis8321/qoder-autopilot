@@ -87,12 +87,21 @@ async def register_and_verify(
         # ═══ STEP 1: Name + Email + ToS ═══
         log_step(2, 7, f"Step 1 — Filling: {identity['display_name']} / {email}")
         await asyncio.sleep(0.3)
+
+        # Scroll to form to ensure it's in viewport
+        try:
+            await page.locator("#basic_firstName").first.scroll_into_view_if_needed(timeout=5000)
+        except Exception:
+            # Fallback: scroll via JS
+            await page.evaluate("() => window.scrollTo(0, 0)")
+
         for selector, value in [
             ("#basic_firstName", identity["first_name"]),
             ("#basic_lastName", identity["last_name"]),
             ("#basic_email", email),
         ]:
             inp = page.locator(selector).first
+            await inp.scroll_into_view_if_needed()
             await inp.fill(value)
 
         # ToS checkbox
@@ -140,6 +149,7 @@ async def register_and_verify(
         log_step(4, 7, "Step 2 — Entering password...")
         try:
             pw_input = page.locator('input[type="password"]').first
+            await pw_input.scroll_into_view_if_needed()
             await pw_input.wait_for(state="visible", timeout=10000)
             await pw_input.fill(identity["password"])
             log("   ✅ Password filled")

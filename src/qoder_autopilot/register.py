@@ -351,6 +351,20 @@ async def register_and_verify(
 
         await asyncio.sleep(1.5)
 
+        # Check if captcha reappeared after OTP — if so, bail out
+        captcha_back = await page.evaluate("""() => {
+            const sels = ['#aliyunCaptcha-sliding', '.aliyunCaptcha', '#nc_1_wrapper',
+                          '.nc-container', '.slide-verify'];
+            for (const s of sels) {
+                const el = document.querySelector(s);
+                if (el && el.offsetParent !== null) return true;
+            }
+            return false;
+        }""")
+        if captcha_back:
+            log_err("Captcha reappeared after OTP — marking as failed")
+            return False
+
         # Check if verified (redirect or success message)
         try:
             await page.wait_for_url(

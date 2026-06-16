@@ -81,10 +81,6 @@ Issues = "https://github.com/Daivageralda/qoder-autopilot/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["src/qoder_autopilot"]
 
-# Include non-Python files (worker template: .js, .sql, .sh, .json)
-[tool.hatch.build.targets.wheel.force-include]
-"src/qoder_autopilot/worker_template" = "qoder_autopilot/worker_template"
-
 [tool.hatch.build.targets.sdist]
 include = [
     "src/",

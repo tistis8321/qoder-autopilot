@@ -8,16 +8,33 @@ Security:
     - File locking for concurrent writes in parallel mode
 """
 
-import fcntl
 import json
 import os
 import stat
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from ..infra import config
 from ..utils.logger import log
+
+# Cross-platform file locking (fcntl is Unix-only)
+_is_unix = sys.platform != "win32"
+if _is_unix:
+    import fcntl
+
+
+def _lock(f):
+    """Acquire exclusive file lock (no-op on Windows)."""
+    if _is_unix:
+        fcntl.flock(f, fcntl.LOCK_EX)
+
+
+def _unlock(f):
+    """Release file lock (no-op on Windows)."""
+    if _is_unix:
+        fcntl.flock(f, fcntl.LOCK_UN)
 
 
 def save_creds(data: dict[str, Any], path: Path | None = None) -> None:
@@ -33,7 +50,7 @@ def save_creds(data: dict[str, Any], path: Path | None = None) -> None:
 
     # Atomic read-modify-write with file locking
     with open(path, "a+") as f:
-        fcntl.flock(f, fcntl.LOCK_EX)
+        _lock(f)
         try:
             f.seek(0)
             content = f.read()
@@ -55,7 +72,7 @@ def save_creds(data: dict[str, Any], path: Path | None = None) -> None:
             f.truncate()
             f.write(json.dumps(accounts, indent=2))
         finally:
-            fcntl.flock(f, fcntl.LOCK_UN)
+            _unlock(f)
 
     # Restrict file permissions: owner read/write only
     try:

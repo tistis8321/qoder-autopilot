@@ -78,9 +78,7 @@ async def slide_puzzle(
         await asyncio.sleep(random.uniform(0.01, 0.04))
 
     # ─── Overshoot + correct (mimics human behavior) ───
-    await page.mouse.move(
-        sx + cx + random.uniform(3, 10), sy, steps=2
-    )
+    await page.mouse.move(sx + cx + random.uniform(3, 10), sy, steps=2)
     await asyncio.sleep(random.uniform(0.1, 0.3))
     await page.mouse.move(sx + target_x, sy, steps=3)
     await asyncio.sleep(random.uniform(0.1, 0.2))

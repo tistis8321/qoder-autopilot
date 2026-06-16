@@ -85,9 +85,7 @@ class CaptchaSolver:
 
         log("   🔒 Captcha detected! Solving...")
         config.SCREENSHOTS_DIR.mkdir(exist_ok=True)
-        await page.screenshot(
-            path=str(config.SCREENSHOTS_DIR / f"captcha_{int(time.time())}.png")
-        )
+        await page.screenshot(path=str(config.SCREENSHOTS_DIR / f"captcha_{int(time.time())}.png"))
 
         tried_positions: list[float] = []
 
@@ -141,10 +139,7 @@ class CaptchaSolver:
             elif attempt <= 2:
                 offset = random.uniform(-5, 5)
             else:
-                offset = (
-                    random.choice([-15, -10, -5, 5, 10, 15])
-                    + random.uniform(-3, 3)
-                )
+                offset = random.choice([-15, -10, -5, 5, 10, 15]) + random.uniform(-3, 3)
             target = max(10, min(track_w - 10, base + offset))
             tried_positions.append(target)
 

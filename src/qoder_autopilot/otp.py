@@ -9,9 +9,25 @@ import re
 
 # Common CSS color codes that look like 6-digit numbers but aren't OTPs
 _CSS_COLORS = {
-    "000000", "111111", "222222", "333333", "444444", "555555", "666666",
-    "777777", "888888", "999999", "aaaaaa", "bbbbbb", "cccccc", "dddddd",
-    "eeeeee", "ffffff", "232323", "464646", "f9f8f9",
+    "000000",
+    "111111",
+    "222222",
+    "333333",
+    "444444",
+    "555555",
+    "666666",
+    "777777",
+    "888888",
+    "999999",
+    "aaaaaa",
+    "bbbbbb",
+    "cccccc",
+    "dddddd",
+    "eeeeee",
+    "ffffff",
+    "232323",
+    "464646",
+    "f9f8f9",
 }
 
 
@@ -36,9 +52,7 @@ def extract_otp(html: str | None) -> str | None:
             return code
 
     # Method 2: big font-size elements
-    big = re.findall(
-        r"font-size:\s*(?:[2-9][0-9]|[1-9][0-9]{2})px[^>]*>([^<]+)<", html
-    )
+    big = re.findall(r"font-size:\s*(?:[2-9][0-9]|[1-9][0-9]{2})px[^>]*>([^<]+)<", html)
     for b in big:
         code = re.sub(r"\D", "", b)
         if len(code) == 6 and code.lower() not in _CSS_COLORS:

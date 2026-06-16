@@ -53,20 +53,19 @@ def initiate_device_flow() -> dict:
     machine_id = str(uuid.uuid4())
 
     # Build the oauth_callback params (mirrors 9Router dashboard)
-    callback_params = urlencode({
-        "challenge": challenge,
-        "challenge_method": "S256",
-        "directLogin": "true",
-        "machine_id": machine_id,
-        "nonce": nonce,
-    })
+    callback_params = urlencode(
+        {
+            "challenge": challenge,
+            "challenge_method": "S256",
+            "directLogin": "true",
+            "machine_id": machine_id,
+            "nonce": nonce,
+        }
+    )
     callback_url = f"{config.QODER_LOGIN_URL}?{callback_params}"
 
     # Wrap in sign-in page with oauth_callback
-    auth_url = (
-        f"{config.QODER_SIGNIN_URL}"
-        f"?oauth_callback={url_quote(callback_url, safe='')}"
-    )
+    auth_url = f"{config.QODER_SIGNIN_URL}?oauth_callback={url_quote(callback_url, safe='')}"
 
     return {
         "auth_url": auth_url,
@@ -116,10 +115,7 @@ def poll_device_token(
             if r.status_code == 200:
                 body = r.json()
                 if body.get("token"):
-                    log_ok(
-                        f"Device token received! "
-                        f"user_id={body.get('user_id', '?')}"
-                    )
+                    log_ok(f"Device token received! user_id={body.get('user_id', '?')}")
                     return body
                 else:
                     log(f"   ⚠️ 200 but no token: {body}")

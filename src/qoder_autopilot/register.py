@@ -60,9 +60,7 @@ async def register_and_verify(
             # Click "Sign up" link on the sign-in page
             log("   🔗 Clicking 'Sign up' link...")
             try:
-                signup_link = page.locator(
-                    'a:has-text("Sign up"), a[href*="sign-up"]'
-                ).first
+                signup_link = page.locator('a:has-text("Sign up"), a[href*="sign-up"]').first
                 await signup_link.click(timeout=5000)
             except Exception:
                 await page.evaluate("""() => {
@@ -124,9 +122,7 @@ async def register_and_verify(
         # Continue → Step 2
         for attempt in range(3):
             try:
-                await page.locator('button[type="submit"]').first.click(
-                    force=True, timeout=5000
-                )
+                await page.locator('button[type="submit"]').first.click(force=True, timeout=5000)
             except Exception:
                 await page.evaluate("""() => {
                     const btns = document.querySelectorAll('button[type="submit"]');
@@ -148,9 +144,7 @@ async def register_and_verify(
             else:
                 log(f"   ⚠️ Step 2 not visible yet (attempt {attempt + 1}/3)")
                 if attempt == 2:
-                    await page.screenshot(
-                        path=str(config.SCREENSHOTS_DIR / "step1_stuck.png")
-                    )
+                    await page.screenshot(path=str(config.SCREENSHOTS_DIR / "step1_stuck.png"))
                     log("   ❌ Step 2 never appeared!")
                     return False
 
@@ -177,7 +171,8 @@ async def register_and_verify(
                 await pw_input.press("Enter")
         except Exception as e:
             log(f"   ⚠️ Playwright fill failed: {e}, trying JS fallback...")
-            pw_filled = await page.evaluate("""(pw) => {
+            pw_filled = await page.evaluate(
+                """(pw) => {
                 const inputs = document.querySelectorAll('input[type="password"]');
                 for (const inp of inputs) {
                     if (inp.offsetParent !== null
@@ -190,18 +185,16 @@ async def register_and_verify(
                     }
                 }
                 return false;
-            }""", identity["password"])
+            }""",
+                identity["password"],
+            )
             if not pw_filled:
                 log_err("Password fill completely failed")
-                await page.screenshot(
-                    path=str(config.SCREENSHOTS_DIR / "pw_fail.png")
-                )
+                await page.screenshot(path=str(config.SCREENSHOTS_DIR / "pw_fail.png"))
                 return False
 
         await asyncio.sleep(1.5)
-        await page.screenshot(
-            path=str(config.SCREENSHOTS_DIR / "after_pw_submit.png")
-        )
+        await page.screenshot(path=str(config.SCREENSHOTS_DIR / "after_pw_submit.png"))
 
         # Debug: check form state
         form_state = await page.evaluate("""() => {
@@ -233,16 +226,19 @@ async def register_and_verify(
         # ═══ STEP 3: Captcha ═══
         log_step(5, 7, "Verify page — Solving captcha...")
         page_text = (
-            await page.evaluate(
-                "() => document.body?.innerText?.substring(0, 500) || ''"
-            )
+            await page.evaluate("() => document.body?.innerText?.substring(0, 500) || ''")
         ).lower()
 
         needs_verify = any(
             kw in page_text
             for kw in [
-                "click to verify", "verify", "human", "captcha",
-                "sure you are", "验证", "点击验证",
+                "click to verify",
+                "verify",
+                "human",
+                "captcha",
+                "sure you are",
+                "验证",
+                "点击验证",
             ]
         )
 
@@ -250,9 +246,12 @@ async def register_and_verify(
             # Click the verify button
             clicked = False
             for sel in [
-                "text=Click to verify", "text=点击验证",
-                "text=verify", "text=Verify",
-                '[class*="verify"]', '[class*="captcha-btn"]',
+                "text=Click to verify",
+                "text=点击验证",
+                "text=verify",
+                "text=Verify",
+                '[class*="verify"]',
+                '[class*="captcha-btn"]',
             ]:
                 try:
                     await page.locator(sel).first.click(timeout=3000)
@@ -279,36 +278,24 @@ async def register_and_verify(
             # Solve captcha
             captcha_ok = await captcha_solver.solve(page)
             if not captcha_ok:
-                await page.screenshot(
-                    path=str(config.SCREENSHOTS_DIR / "captcha_fail.png")
-                )
+                await page.screenshot(path=str(config.SCREENSHOTS_DIR / "captcha_fail.png"))
                 return False
             await asyncio.sleep(1)
 
         # ═══ Wait for OTP page ═══
         log("   ⏳ Waiting for OTP page...")
         await asyncio.sleep(1)
-        await page.screenshot(
-            path=str(config.SCREENSHOTS_DIR / "after_captcha.png")
-        )
+        await page.screenshot(path=str(config.SCREENSHOTS_DIR / "after_captcha.png"))
 
         otp_count = await page.locator(".ant-otp-input").count()
         page_text2 = (
-            await page.evaluate(
-                "() => document.body?.innerText?.substring(0, 500) || ''"
-            )
+            await page.evaluate("() => document.body?.innerText?.substring(0, 500) || ''")
         ).lower()
         log(f"   Page state: otp_inputs={otp_count}, text='{page_text2[:150]}'")
 
-        if (
-            otp_count == 0
-            and "enter the code" not in page_text2
-            and "otp" not in page_text2
-        ):
+        if otp_count == 0 and "enter the code" not in page_text2 and "otp" not in page_text2:
             log_err("OTP page didn't appear after captcha solve")
-            await page.screenshot(
-                path=str(config.SCREENSHOTS_DIR / "no_otp_page.png")
-            )
+            await page.screenshot(path=str(config.SCREENSHOTS_DIR / "no_otp_page.png"))
             return False
 
         # ═══ STEP 4: Wait for OTP email ═══
@@ -369,8 +356,7 @@ async def register_and_verify(
         try:
             await page.wait_for_url(
                 lambda url: any(
-                    x in url
-                    for x in ["/account/", "/device/selectAccounts", "/dashboard"]
+                    x in url for x in ["/account/", "/device/selectAccounts", "/dashboard"]
                 ),
                 timeout=15000,
             )
@@ -381,23 +367,17 @@ async def register_and_verify(
 
         # Check page text for success indicators
         final_text = (
-            await page.evaluate(
-                "() => document.body?.innerText?.substring(0, 500) || ''"
-            )
+            await page.evaluate("() => document.body?.innerText?.substring(0, 500) || ''")
         ).lower()
         if any(kw in final_text for kw in ["verified", "success", "welcome"]):
             log_ok("Account verified!")
             return True
 
-        await page.screenshot(
-            path=str(config.SCREENSHOTS_DIR / "otp_result.png")
-        )
+        await page.screenshot(path=str(config.SCREENSHOTS_DIR / "otp_result.png"))
         log(f"   Page after OTP: {final_text[:200]}")
         return True
 
     except Exception as e:
         log_err(f"Register error: {e}")
-        await page.screenshot(
-            path=str(config.SCREENSHOTS_DIR / "error.png")
-        )
+        await page.screenshot(path=str(config.SCREENSHOTS_DIR / "error.png"))
         return False

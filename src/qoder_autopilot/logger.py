@@ -20,32 +20,30 @@ _BOLD = "\033[1m"
 _DIM = "\033[2m"
 
 _COLORS = {
-    "reset":  _RESET,
-    "bold":   _BOLD,
-    "dim":    _DIM,
-    "red":    "\033[31m",
-    "green":  "\033[32m",
+    "reset": _RESET,
+    "bold": _BOLD,
+    "dim": _DIM,
+    "red": "\033[31m",
+    "green": "\033[32m",
     "yellow": "\033[33m",
-    "blue":   "\033[34m",
-    "cyan":   "\033[36m",
-    "white":  "\033[37m",
-    "gray":   "\033[90m",
+    "blue": "\033[34m",
+    "cyan": "\033[36m",
+    "white": "\033[37m",
+    "gray": "\033[90m",
 }
 
 # Level → (color, label)
 _LEVELS: dict[str, tuple[str, str]] = {
-    "DEBUG": ("gray",   "DBG"),
-    "INFO":  ("white",  "INF"),
-    "OK":    ("green",  " OK"),
-    "WARN":  ("yellow", "WRN"),
-    "ERROR": ("red",    "ERR"),
-    "STEP":  ("cyan",   "STP"),
+    "DEBUG": ("gray", "DBG"),
+    "INFO": ("white", "INF"),
+    "OK": ("green", " OK"),
+    "WARN": ("yellow", "WRN"),
+    "ERROR": ("red", "ERR"),
+    "STEP": ("cyan", "STP"),
 }
 
 # Context variable for parallel mode account labeling
-_acct_tag: contextvars.ContextVar[str] = contextvars.ContextVar(
-    "acct_tag", default=""
-)
+_acct_tag: contextvars.ContextVar[str] = contextvars.ContextVar("acct_tag", default="")
 
 # Whether to use colors (auto-detect terminal)
 _use_colors: bool = hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
@@ -59,6 +57,7 @@ def _c(color: str, text: str) -> str:
 
 
 # ── Public API ────────────────────────────────────────────────────────────
+
 
 def log(
     msg: str,

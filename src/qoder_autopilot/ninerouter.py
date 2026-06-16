@@ -59,34 +59,33 @@ def add_to_9router_device(
         if expires_in > 2592000:
             expires_in = 2592000
         if not expires_at:
-            expires_at = (
-                datetime.now(timezone.utc) + timedelta(seconds=expires_in)
-            ).isoformat()
+            expires_at = (datetime.now(timezone.utc) + timedelta(seconds=expires_in)).isoformat()
 
         conn = sqlite3.connect(db)
         c = conn.cursor()
 
         # Get next priority
         c.execute(
-            "SELECT COALESCE(MAX(priority),0)+1 "
-            "FROM providerConnections WHERE provider='qoder'"
+            "SELECT COALESCE(MAX(priority),0)+1 FROM providerConnections WHERE provider='qoder'"
         )
         prio = c.fetchone()[0]
 
-        data = json.dumps({
-            "displayName": display_name,
-            "accessToken": at,
-            "refreshToken": rt,
-            "expiresAt": expires_at,
-            "testStatus": "active",
-            "expiresIn": expires_in,
-            "providerSpecificData": {
-                "authMethod": "device",
-                "userId": user_id,
-                "machineId": machine_id,
-                "organizationId": "",
-            },
-        })
+        data = json.dumps(
+            {
+                "displayName": display_name,
+                "accessToken": at,
+                "refreshToken": rt,
+                "expiresAt": expires_at,
+                "testStatus": "active",
+                "expiresIn": expires_in,
+                "providerSpecificData": {
+                    "authMethod": "device",
+                    "userId": user_id,
+                    "machineId": machine_id,
+                    "organizationId": "",
+                },
+            }
+        )
 
         now = datetime.now(timezone.utc).isoformat()
         c.execute(

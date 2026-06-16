@@ -48,12 +48,15 @@ def err(msg: str) -> None:
 # PREREQUISITE CHECKS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def check_node() -> bool:
     """Check if Node.js is installed."""
     try:
         result = subprocess.run(
             ["node", "--version"],
-            capture_output=True, text=True, timeout=5,
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         if result.returncode == 0:
             ok(f"Node.js {result.stdout.strip()}")
@@ -69,7 +72,9 @@ def check_npx() -> bool:
     try:
         result = subprocess.run(
             ["npx", "--version"],
-            capture_output=True, text=True, timeout=5,
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         if result.returncode == 0:
             ok(f"npx {result.stdout.strip()}")
@@ -85,7 +90,9 @@ def check_wrangler_auth() -> bool:
     try:
         result = subprocess.run(
             ["npx", "wrangler", "whoami"],
-            capture_output=True, text=True, timeout=15,
+            capture_output=True,
+            text=True,
+            timeout=15,
         )
         if result.returncode == 0:
             # Extract email from output
@@ -121,6 +128,7 @@ def wrangler_login() -> bool:
 # ═══════════════════════════════════════════════════════════════════════════════
 # EXTRACT + DEPLOY
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def extract_template(dest: Path) -> bool:
     """Extract bundled worker template to destination directory."""
@@ -204,19 +212,22 @@ def _detect_worker_url(work_dir: Path) -> str | None:
     try:
         result = subprocess.run(
             ["npx", "wrangler", "whoami"],
-            capture_output=True, text=True, timeout=15,
+            capture_output=True,
+            text=True,
+            timeout=15,
             cwd=str(work_dir),
         )
         # Parse subdomain from output like:
         # "│ xxxxxx  │ daivageralda831.workers.dev │"
         for line in result.stdout.splitlines():
-            match = re.search(r'(\S+)\.workers\.dev', line)
+            match = re.search(r"(\S+)\.workers\.dev", line)
             if match:
                 subdomain = match.group(1)
                 url = f"https://{worker_name}.{subdomain}.workers.dev"
                 # Verify it's reachable
                 try:
                     import urllib.request
+
                     req = urllib.request.Request(f"{url}/api/health", method="GET")
                     resp = urllib.request.urlopen(req, timeout=5)
                     if resp.status == 200:
@@ -231,7 +242,9 @@ def _detect_worker_url(work_dir: Path) -> str | None:
 
     # Fallback: ask user
     print()
-    url = input(f"  {BOLD}[?] Worker URL{NC} (e.g. https://{worker_name}.yoursubdomain.workers.dev): ").strip()
+    url = input(
+        f"  {BOLD}[?] Worker URL{NC} (e.g. https://{worker_name}.yoursubdomain.workers.dev): "
+    ).strip()
     if url and url.startswith("http"):
         return url.rstrip("/")
 
@@ -251,6 +264,7 @@ def save_worker_url(url: str) -> None:
 # ═══════════════════════════════════════════════════════════════════════════════
 # MAIN DEPLOY FLOW
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def deploy_worker() -> None:
     """Main deploy flow — extract, setup, configure."""

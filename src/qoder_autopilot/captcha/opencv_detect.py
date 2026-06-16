@@ -84,9 +84,7 @@ async def detect_gap_position(page) -> float | None:
         kernel_size = max(3, pz_w // 4)
         if kernel_size % 2 == 0:
             kernel_size += 1
-        smoothed = cv2.GaussianBlur(
-            col_brightness.reshape(1, -1), (kernel_size, 1), 0
-        ).flatten()
+        smoothed = cv2.GaussianBlur(col_brightness.reshape(1, -1), (kernel_size, 1), 0).flatten()
 
         window = pz_w
         min_brightness = float("inf")
@@ -132,21 +130,15 @@ async def detect_gap_position(page) -> float | None:
         # ─── Method 3: Masked template matching ───
         pz_gray_tmpl = cv2.cvtColor(pz_bgr, cv2.COLOR_BGR2GRAY)
         tm_mask = (
-            pz_mask
-            if pz_mask is not None
-            else np.ones(pz_bgr.shape[:2], dtype=np.uint8) * 255
+            pz_mask if pz_mask is not None else np.ones(pz_bgr.shape[:2], dtype=np.uint8) * 255
         )
 
-        result_masked = cv2.matchTemplate(
-            bg_gray, pz_gray_tmpl, cv2.TM_CCOEFF_NORMED, mask=tm_mask
-        )
+        result_masked = cv2.matchTemplate(bg_gray, pz_gray_tmpl, cv2.TM_CCOEFF_NORMED, mask=tm_mask)
         _, max_val_masked, _, max_loc_masked = cv2.minMaxLoc(result_masked)
         gap_x_method3 = max_loc_masked[0]
 
         # ─── Method 4: SQDIFF masked ───
-        result_sqdiff = cv2.matchTemplate(
-            bg_gray, pz_gray_tmpl, cv2.TM_SQDIFF_NORMED, mask=tm_mask
-        )
+        result_sqdiff = cv2.matchTemplate(bg_gray, pz_gray_tmpl, cv2.TM_SQDIFF_NORMED, mask=tm_mask)
         _, _, min_loc_sq, _ = cv2.minMaxLoc(result_sqdiff)
         gap_x_method4 = min_loc_sq[0]
 
@@ -160,9 +152,7 @@ async def detect_gap_position(page) -> float | None:
 
         best_votes = {}
         for name, x in methods.items():
-            votes = sum(
-                1 for other_x in methods.values() if abs(x - other_x) < 25
-            )
+            votes = sum(1 for other_x in methods.values() if abs(x - other_x) < 25)
             best_votes[name] = votes
 
         winner = max(best_votes.keys(), key=lambda k: k and best_votes[k])
@@ -176,9 +166,7 @@ async def detect_gap_position(page) -> float | None:
             gap_x = gap_x_method3
             confidence = max_val_masked
 
-        method_str = (
-            f"winner={winner}(votes={best_votes[winner]}) | {methods}"
-        )
+        method_str = f"winner={winner}(votes={best_votes[winner]}) | {methods}"
         log(f"   🔍 Gap: x={gap_x}px | {method_str}")
 
         bg_img_width = bg_img.shape[1]

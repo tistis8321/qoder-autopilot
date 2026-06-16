@@ -158,7 +158,9 @@ async def gemini_detect_gap(page) -> float | None:
         crop_y2 = min(actual_h, pz_img_y + pz_img_h + pad)
         crop_h = crop_y2 - crop_y1
 
-        log(f"   📐 Strip: pz_y={pz_img_y}, pz_h={pz_img_h} → crop {crop_y1}-{crop_y2} ({crop_h}px)")
+        log(
+            f"   📐 Strip: pz_y={pz_img_y}, pz_h={pz_img_h} → crop {crop_y1}-{crop_y2} ({crop_h}px)"
+        )
 
         bg_strip = bg_img[crop_y1:crop_y2, :]
 
@@ -223,16 +225,23 @@ async def gemini_detect_gap(page) -> float | None:
             pad_top = (min_height - composite.shape[0]) // 2
             pad_bottom = min_height - composite.shape[0] - pad_top
             composite = cv2.copyMakeBorder(
-                composite, pad_top, pad_bottom, 0, 0,
-                cv2.BORDER_CONSTANT, value=[200, 200, 200],
+                composite,
+                pad_top,
+                pad_bottom,
+                0,
+                0,
+                cv2.BORDER_CONSTANT,
+                value=[200, 200, 200],
             )
 
         _, comp_buf = cv2.imencode(".png", composite)
         comp_b64 = base64.b64encode(comp_buf).decode("ascii")
         comp_w = composite.shape[1]
 
-        log(f"   🔬 CV2: strip={strip_w}x{strip_h}, composite={comp_w}x{strip_h}, "
-            f"puzzle={'yes' if pz_silhouette_b64 else 'no'}")
+        log(
+            f"   🔬 CV2: strip={strip_w}x{strip_h}, composite={comp_w}x{strip_h}, "
+            f"puzzle={'yes' if pz_silhouette_b64 else 'no'}"
+        )
 
         # Save debug screenshot
         try:
@@ -262,14 +271,18 @@ Answer MUST be between 10 and {strip_w - 10}.
 Respond ONLY with JSON: {{"x": 150, "confidence": 0.95}}"""
 
         content = [{"type": "text", "text": prompt}]
-        content.append({
-            "type": "text",
-            "text": "BACKGROUND STRIP (original | enhanced | edges):",
-        })
-        content.append({
-            "type": "image_url",
-            "image_url": {"url": f"data:image/png;base64,{comp_b64}"},
-        })
+        content.append(
+            {
+                "type": "text",
+                "text": "BACKGROUND STRIP (original | enhanced | edges):",
+            }
+        )
+        content.append(
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:image/png;base64,{comp_b64}"},
+            }
+        )
 
         response = client.chat.completions.create(
             model=model,

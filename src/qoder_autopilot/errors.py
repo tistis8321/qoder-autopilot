@@ -45,11 +45,13 @@ class QoderAutopilotError(Exception):
 
 # ── Temp Mail ─────────────────────────────────────────────────────────────
 
+
 class TempMailError(QoderAutopilotError):
     """Failed to generate email or access inbox."""
 
 
 # ── Captcha ───────────────────────────────────────────────────────────────
+
 
 class CaptchaError(QoderAutopilotError):
     """Captcha solving failed."""
@@ -74,6 +76,7 @@ class CaptchaAIFailed(CaptchaError):  # noqa: N818
 
 # ── Registration ──────────────────────────────────────────────────────────
 
+
 class RegistrationError(QoderAutopilotError):
     """Registration flow failed."""
 
@@ -97,6 +100,7 @@ class FormSubmitError(RegistrationError):
 
 # ── OAuth ─────────────────────────────────────────────────────────────────
 
+
 class OAuthError(QoderAutopilotError):
     """OAuth / PKCE flow error."""
 
@@ -112,6 +116,7 @@ class DeviceTokenTimeout(OAuthError):  # noqa: N818
 
 
 # ── 9Router ───────────────────────────────────────────────────────────────
+
 
 class NineRouterError(QoderAutopilotError):
     """9Router integration error."""

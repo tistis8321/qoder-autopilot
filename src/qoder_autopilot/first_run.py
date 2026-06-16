@@ -7,7 +7,6 @@ Usage:
     Called automatically by cli.main() when no config exists.
 """
 
-
 from .user_config import CONFIG_FILE
 
 BOLD = "\033[1m"
@@ -74,6 +73,7 @@ def run_first_run_wizard() -> bool:
 
                 if sub == "a":
                     from .deploy import deploy_worker
+
                     deploy_worker()
                     _mark_configured()
                     return True
@@ -82,6 +82,7 @@ def run_first_run_wizard() -> bool:
                     url = input(f"  {BOLD}[?] Worker URL:{NC} ").strip()
                     if url and url.startswith("http"):
                         from .deploy import save_worker_url
+
                         save_worker_url(url.rstrip("/"))
                         _mark_configured()
                         return True

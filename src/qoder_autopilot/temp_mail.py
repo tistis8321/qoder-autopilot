@@ -33,6 +33,7 @@ from .logger import log, log_err, log_ok
 # BASE CLASS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TempMailProvider(ABC):
     """Abstract base class for temp mail providers."""
 
@@ -96,6 +97,7 @@ class TempMailProvider(ABC):
 # PROVIDER: CLOUDFLARE WORKER
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class CloudflareProvider(TempMailProvider):
     """Cloudflare Worker-based temp mail (default, no API key needed).
 
@@ -122,9 +124,7 @@ class CloudflareProvider(TempMailProvider):
 
     def inbox(self, address: str) -> list[dict]:
         try:
-            r = requests.get(
-                f"{self.url}/api/inbox/{url_quote(address)}", timeout=15
-            )
+            r = requests.get(f"{self.url}/api/inbox/{url_quote(address)}", timeout=15)
             r.raise_for_status()
         except requests.RequestException as e:
             raise TempMailError("Inbox fetch failed", str(e)) from e
@@ -146,6 +146,7 @@ class CloudflareProvider(TempMailProvider):
 # ═══════════════════════════════════════════════════════════════════════════════
 # PROVIDER: MOCA SUPABASE
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class MocaProvider(TempMailProvider):
     """Supabase-based temp mail API by Moca (requires API key).
@@ -189,7 +190,8 @@ class MocaProvider(TempMailProvider):
 
         try:
             r = requests.request(
-                method, url,
+                method,
+                url,
                 headers=self._headers(),
                 json=kwargs.get("json"),
                 timeout=15,
@@ -229,7 +231,8 @@ class MocaProvider(TempMailProvider):
             )
 
         d = self._request(
-            "GET", "messages",
+            "GET",
+            "messages",
             params={"address": address, "owner_token": self._owner_token},
         )
 
@@ -243,7 +246,8 @@ class MocaProvider(TempMailProvider):
             raise TempMailError("No owner_token", "Call generate() first")
 
         d = self._request(
-            "GET", "message",
+            "GET",
+            "message",
             params={"id": msg_id, "owner_token": self._owner_token},
         )
 
@@ -258,7 +262,8 @@ class MocaProvider(TempMailProvider):
             return False
 
         d = self._request(
-            "POST", "delete",
+            "POST",
+            "delete",
             json={"address": address, "owner_token": self._owner_token},
         )
         return d.get("ok", False)
@@ -267,6 +272,7 @@ class MocaProvider(TempMailProvider):
 # ═══════════════════════════════════════════════════════════════════════════════
 # FACTORY
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def create_temp_mail(provider: str | None = None) -> TempMailProvider:
     """Create a temp mail provider instance.

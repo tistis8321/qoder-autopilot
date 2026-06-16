@@ -23,10 +23,12 @@ def save_creds(data: dict[str, Any], path: Path | None = None) -> None:
         except (json.JSONDecodeError, OSError):
             accounts = []
 
-    accounts.append({
-        **data,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-    })
+    accounts.append(
+        {
+            **data,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+    )
     path.write_text(json.dumps(accounts, indent=2))
     log(f"   💾 Saved to {path}")
 

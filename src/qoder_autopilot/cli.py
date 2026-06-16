@@ -96,7 +96,9 @@ async def run_one(
         page = await browser.new_page()
         await setup_page(page)
         verified = await register_and_verify(
-            page, email, ident,
+            page,
+            email,
+            ident,
             auth_url=auth_url,
             manual_captcha=manual_captcha,
             acct_num=acct_num,
@@ -104,20 +106,20 @@ async def run_one(
 
         # Keep browser open briefly for redirect
         await asyncio.sleep(2)
-        await page.screenshot(
-            path=str(config.SCREENSHOTS_DIR / "final_state.png")
-        )
+        await page.screenshot(path=str(config.SCREENSHOTS_DIR / "final_state.png"))
         final_url = page.url
         log(f"   📍 Final URL: {final_url}")
 
     if not verified:
         log_err("Registration/verification failed!")
-        save_creds({
-            "email": email,
-            "password": ident["password"],
-            "display_name": ident["display_name"],
-            "status": "failed",
-        })
+        save_creds(
+            {
+                "email": email,
+                "password": ident["password"],
+                "display_name": ident["display_name"],
+                "status": "failed",
+            }
+        )
         return None
 
     log_ok("Account registered & verified! ✅")
@@ -126,8 +128,10 @@ async def run_one(
     if flow:
         log("📋 Step 4/4: Polling device token...")
         device_token = poll_device_token(
-            flow["nonce"], flow["verifier"],
-            max_attempts=60, interval=3,
+            flow["nonce"],
+            flow["verifier"],
+            max_attempts=60,
+            interval=3,
         )
 
         if device_token:
@@ -137,8 +141,10 @@ async def run_one(
             router_ok = False
             try:
                 add_to_9router_device(
-                    email, ident["display_name"],
-                    device_token, flow["machine_id"],
+                    email,
+                    ident["display_name"],
+                    device_token,
+                    flow["machine_id"],
                 )
                 router_ok = True
             except NineRouterDBNotFound as e:
@@ -146,17 +152,19 @@ async def run_one(
             except NineRouterError as e:
                 log_err(f"9Router insert failed: {e}")
 
-            save_creds({
-                "email": email,
-                "password": ident["password"],
-                "display_name": ident["display_name"],
-                "access_token": device_token["token"],
-                "refresh_token": device_token.get("refresh_token", ""),
-                "user_id": device_token.get("user_id", ""),
-                "machine_id": flow["machine_id"],
-                "9router": router_ok,
-                "status": "success",
-            })
+            save_creds(
+                {
+                    "email": email,
+                    "password": ident["password"],
+                    "display_name": ident["display_name"],
+                    "access_token": device_token["token"],
+                    "refresh_token": device_token.get("refresh_token", ""),
+                    "user_id": device_token.get("user_id", ""),
+                    "machine_id": flow["machine_id"],
+                    "9router": router_ok,
+                    "status": "success",
+                }
+            )
             if router_ok:
                 log_ok(f"🎉 {email} → 9Router connected")
             else:
@@ -164,21 +172,25 @@ async def run_one(
             return {"email": email, "token": device_token["token"]}
         else:
             log_err("Device token poll failed — account verified but no token")
-            save_creds({
-                "email": email,
-                "password": ident["password"],
-                "display_name": ident["display_name"],
-                "status": "verified_no_token",
-            })
+            save_creds(
+                {
+                    "email": email,
+                    "password": ident["password"],
+                    "display_name": ident["display_name"],
+                    "status": "verified_no_token",
+                }
+            )
             return None
     else:
         log("⚠️ No OAuth flow — just registration done")
-        save_creds({
-            "email": email,
-            "password": ident["password"],
-            "display_name": ident["display_name"],
-            "status": "verified_no_oauth",
-        })
+        save_creds(
+            {
+                "email": email,
+                "password": ident["password"],
+                "display_name": ident["display_name"],
+                "status": "verified_no_oauth",
+            }
+        )
         return {"email": email}
 
 
@@ -250,11 +262,13 @@ def main() -> None:
 
         if sub == "deploy":
             from .deploy import deploy_worker
+
             deploy_worker()
             return
 
     # ── First-run wizard ──
     from .first_run import is_first_run, run_first_run_wizard
+
     if is_first_run():
         if not run_first_run_wizard():
             return
@@ -271,27 +285,36 @@ def main() -> None:
         description="Automated Qoder account registration with 9Router integration",
     )
     p.add_argument(
-        "-n", "--count", type=int, default=1,
+        "-n",
+        "--count",
+        type=int,
+        default=1,
         help="Number of accounts to create",
     )
     p.add_argument(
-        "--no-headless", action="store_true",
+        "--no-headless",
+        action="store_true",
         help="Show browser windows",
     )
     p.add_argument(
-        "--no-oauth", action="store_true",
+        "--no-oauth",
+        action="store_true",
         help="Skip OAuth flow, just register",
     )
     p.add_argument(
-        "--manual-captcha", action="store_true",
+        "--manual-captcha",
+        action="store_true",
         help="Pause for manual captcha solving (forces non-headless)",
     )
     p.add_argument(
-        "--parallel", action="store_true",
+        "--parallel",
+        action="store_true",
         help="Run all accounts concurrently",
     )
     p.add_argument(
-        "--delay", type=int, default=config.PARALLEL_DELAY,
+        "--delay",
+        type=int,
+        default=config.PARALLEL_DELAY,
         help=f"Delay between sequential accounts (default: {config.PARALLEL_DELAY}s)",
     )
     args = p.parse_args()
@@ -339,6 +362,7 @@ def _handle_config_command(argv: list[str]) -> None:
         cfg = load_user_config()
         # Also show defaults and env overrides
         from .config import settings
+
         print(f"{'Setting':<25} {'Value':<50} {'Source':<10}")
         print("─" * 85)
         for key, info in USER_CONFIGURABLE.items():

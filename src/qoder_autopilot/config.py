@@ -36,6 +36,7 @@ PROJECT_DIR = PACKAGE_DIR.parent.parent  # src/../.. = project root
 # SETTINGS CLASS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class Settings(BaseSettings):
     """
     Centralized configuration for Qoder Autopilot.
@@ -151,9 +152,7 @@ class Settings(BaseSettings):
         default=120,
         description="Max seconds to wait for manual captcha solve",
     )
-    otp_timeout: int = Field(
-        default=20, description="Max seconds to wait for OTP email"
-    )
+    otp_timeout: int = Field(default=20, description="Max seconds to wait for OTP email")
     max_captcha_attempts: int = Field(
         default=8,
         description="Max automatic captcha solve attempts",
@@ -241,15 +240,61 @@ CREDENTIALS_FILE = settings.credentials_file
 # Handled by Faker (id_ID locale) in identity.py
 # These pools are kept as fallback only
 FIRST_NAMES = [
-    "Raihan", "Ahmad", "Budi", "Dimas", "Eko", "Fajar", "Gilang", "Hadi",
-    "Irfan", "Joko", "Kevin", "Lukman", "Muhammad", "Naufal", "Omar",
-    "Putra", "Rizky", "Satria", "Taufik", "Umar", "Vino", "Wahyu",
-    "Yusuf", "Zaki", "Andi", "Bayu", "Cahya", "Dani", "Elang", "Faris",
+    "Raihan",
+    "Ahmad",
+    "Budi",
+    "Dimas",
+    "Eko",
+    "Fajar",
+    "Gilang",
+    "Hadi",
+    "Irfan",
+    "Joko",
+    "Kevin",
+    "Lukman",
+    "Muhammad",
+    "Naufal",
+    "Omar",
+    "Putra",
+    "Rizky",
+    "Satria",
+    "Taufik",
+    "Umar",
+    "Vino",
+    "Wahyu",
+    "Yusuf",
+    "Zaki",
+    "Andi",
+    "Bayu",
+    "Cahya",
+    "Dani",
+    "Elang",
+    "Faris",
 ]
 
 LAST_NAMES = [
-    "Geralda", "Pratama", "Saputra", "Wijaya", "Kurniawan", "Hidayat",
-    "Nugraha", "Santoso", "Wibowo", "Permadi", "Ramadhan", "Setiawan",
-    "Utama", "Firmansyah", "Gunawan", "Hakim", "Ibrahim", "Jaya",
-    "Kusuma", "Lesmana", "Mulyadi", "Nurhadi", "Prasetyo", "Rahman",
+    "Geralda",
+    "Pratama",
+    "Saputra",
+    "Wijaya",
+    "Kurniawan",
+    "Hidayat",
+    "Nugraha",
+    "Santoso",
+    "Wibowo",
+    "Permadi",
+    "Ramadhan",
+    "Setiawan",
+    "Utama",
+    "Firmansyah",
+    "Gunawan",
+    "Hakim",
+    "Ibrahim",
+    "Jaya",
+    "Kusuma",
+    "Lesmana",
+    "Mulyadi",
+    "Nurhadi",
+    "Prasetyo",
+    "Rahman",
 ]

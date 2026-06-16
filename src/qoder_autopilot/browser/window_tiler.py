@@ -35,7 +35,8 @@ def get_screen_size() -> tuple[int, int]:
     try:
         result = subprocess.run(
             [
-                "osascript", "-e",
+                "osascript",
+                "-e",
                 'tell application "Finder" to get bounds of window of desktop',
             ],
             capture_output=True,
@@ -66,24 +67,32 @@ def tile_all_camoufox_windows() -> None:
 
     # Grid positions: (left, top, right, bottom)
     grid = [
-        (0, menubar, half_w, half_h + menubar),                     # top-left
-        (half_w, menubar, sw, half_h + menubar),                    # top-right
-        (0, half_h + menubar, half_w, sh),                          # bottom-left
-        (half_w, half_h + menubar, sw, sh),                         # bottom-right
+        (0, menubar, half_w, half_h + menubar),  # top-left
+        (half_w, menubar, sw, half_h + menubar),  # top-right
+        (0, half_h + menubar, half_w, sh),  # bottom-left
+        (half_w, half_h + menubar, sw, sh),  # bottom-right
     ]
 
     # Build AppleScript grid list
     g = grid
     grid_str = (
         "{"
-        + "{" + f"{g[0][0]}, {g[0][1]}, {g[0][2]}, {g[0][3]}" + "}, "
-        + "{" + f"{g[1][0]}, {g[1][1]}, {g[1][2]}, {g[1][3]}" + "}, "
-        + "{" + f"{g[2][0]}, {g[2][1]}, {g[2][2]}, {g[2][3]}" + "}, "
-        + "{" + f"{g[3][0]}, {g[3][1]}, {g[3][2]}, {g[3][3]}" + "}"
+        + "{"
+        + f"{g[0][0]}, {g[0][1]}, {g[0][2]}, {g[0][3]}"
+        + "}, "
+        + "{"
+        + f"{g[1][0]}, {g[1][1]}, {g[1][2]}, {g[1][3]}"
+        + "}, "
+        + "{"
+        + f"{g[2][0]}, {g[2][1]}, {g[2][2]}, {g[2][3]}"
+        + "}, "
+        + "{"
+        + f"{g[3][0]}, {g[3][1]}, {g[3][2]}, {g[3][3]}"
+        + "}"
         + "}"
     )
 
-    script = f'''
+    script = f"""
     tell application "camoufox"
         set winCount to count of windows
         set grid to {grid_str}
@@ -93,7 +102,7 @@ def tile_all_camoufox_windows() -> None:
         end repeat
         return winCount
     end tell
-    '''
+    """
 
     try:
         result = subprocess.run(

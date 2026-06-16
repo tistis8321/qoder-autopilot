@@ -91,7 +91,5 @@ async def handle_captcha_manual(page) -> bool:
         await asyncio.sleep(1)
 
     log_err(f"Manual captcha timeout ({config.CAPTCHA_TIMEOUT}s) — user didn't solve it")
-    await page.screenshot(
-        path=str(config.SCREENSHOTS_DIR / "manual_captcha_timeout.png")
-    )
+    await page.screenshot(path=str(config.SCREENSHOTS_DIR / "manual_captcha_timeout.png"))
     return False

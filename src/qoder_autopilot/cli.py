@@ -330,7 +330,11 @@ def _handle_config_command(argv: list[str]) -> None:
         print()
         print(f"Config file: {CONFIG_FILE}")
 
-    elif cmd == "set" and len(argv) >= 3:
+    elif cmd == "set":
+        if len(argv) < 3:
+            print("Usage: qoder-autopilot config set <key> <value>")
+            print("Example: qoder-autopilot config set worker-url https://my-worker.workers.dev")
+            sys.exit(1)
         cli_flag = argv[1]
         value = argv[2]
         # Map CLI flag to config key
@@ -347,7 +351,10 @@ def _handle_config_command(argv: list[str]) -> None:
             print(f"❌ Failed to set {cli_flag} (invalid value?)")
             sys.exit(1)
 
-    elif cmd == "get" and len(argv) >= 2:
+    elif cmd == "get":
+        if len(argv) < 2:
+            print("Usage: qoder-autopilot config get <key>")
+            sys.exit(1)
         cli_flag = argv[1]
         key_map = {info["cli_flag"]: key for key, info in USER_CONFIGURABLE.items()}
         key = key_map.get(cli_flag)

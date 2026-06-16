@@ -216,7 +216,7 @@ async def main_async(args: argparse.Namespace) -> None:
 
     headless = args.headless
     use_oauth = not args.no_oauth
-    manual_captcha = args.manual_captcha
+    manual_captcha = not args.auto_captcha
     parallel = args.parallel
 
     # U3: Warn about parallel + manual captcha conflict
@@ -422,9 +422,9 @@ def main() -> None:
         help="Skip OAuth flow, just register",
     )
     p.add_argument(
-        "--manual-captcha",
+        "--auto-captcha",
         action="store_true",
-        help="Pause for manual captcha solving (forces non-headless)",
+        help="Use auto captcha solver (OpenCV/AI) instead of manual",
     )
     p.add_argument(
         "--parallel",

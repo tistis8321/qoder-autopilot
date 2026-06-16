@@ -14,6 +14,7 @@ import asyncio
 import os
 import platform
 import random
+import signal
 import sys
 
 from . import config
@@ -197,10 +198,51 @@ async def run_one(
 
 async def main_async(args: argparse.Namespace) -> None:
     """Async main entry point."""
+    # U6: Graceful shutdown on Ctrl+C
+    _shutdown_event = asyncio.Event()
+
+    def _handle_signal():
+        log_warn("Shutdown requested (Ctrl+C) — cleaning up...")
+        _shutdown_event.set()
+
+    try:
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, _handle_signal)
+    except NotImplementedError:
+        pass  # Windows doesn't support add_signal_handler
+
     headless = not args.no_headless
     use_oauth = not args.no_oauth
     manual_captcha = args.manual_captcha
     parallel = args.parallel
+
+    # U3: Warn about parallel + manual captcha conflict
+    if parallel and manual_captcha and args.count > 1:
+        log_warn(
+            "--parallel + --manual-captcha: multiple browser windows will open "
+            "simultaneously. Manual captcha solving may be confusing."
+        )
+
+    # U4: Apply verbosity
+    from .logger import set_verbosity
+
+    if args.verbose:
+        set_verbosity(2)
+    elif args.quiet:
+        set_verbosity(0)
+
+    # U5: Dry-run mode
+    if args.dry_run:
+        log_ok("Dry-run mode: configuration is valid ✅")
+        log(f"  Accounts: {args.count}")
+        log(f"  Headless: {headless}")
+        log(f"  OAuth: {use_oauth}")
+        log(f"  Manual captcha: {manual_captcha}")
+        log(f"  Parallel: {parallel}")
+        log(f"  Worker URL: {config.settings.worker_url}")
+        log(f"  9Router DB: {config.settings.ninerouter_db_path}")
+        return
 
     log(
         f"🎯 Creating {args.count} account(s) | "
@@ -308,12 +350,20 @@ def main() -> None:
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+
+    def _valid_count(val: str) -> int:
+        """Validate count is between 1 and 100."""
+        n = int(val)
+        if n < 1 or n > 100:
+            raise argparse.ArgumentTypeError(f"Count must be between 1 and 100, got {n}")
+        return n
+
     p.add_argument(
         "-n",
         "--count",
-        type=int,
+        type=_valid_count,
         default=1,
-        help="Number of accounts to create",
+        help="Number of accounts to create (1-100)",
     )
     p.add_argument(
         "--no-headless",
@@ -340,6 +390,23 @@ def main() -> None:
         type=int,
         default=config.PARALLEL_DELAY,
         help=f"Delay between sequential accounts (default: {config.PARALLEL_DELAY}s)",
+    )
+    p.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Show debug-level logs",
+    )
+    p.add_argument(
+        "--quiet",
+        "-q",
+        action="store_true",
+        help="Only show errors and warnings",
+    )
+    p.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate configuration and exit without registering",
     )
     args = p.parse_args()
 

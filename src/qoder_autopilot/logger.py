@@ -48,6 +48,20 @@ _acct_tag: contextvars.ContextVar[str] = contextvars.ContextVar("acct_tag", defa
 # Whether to use colors (auto-detect terminal)
 _use_colors: bool = hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
 
+# Verbosity: 0=quiet, 1=normal (default), 2=verbose
+_verbosity: int = 1
+
+
+def set_verbosity(level: int) -> None:
+    """Set logging verbosity. 0=quiet (errors only), 1=normal, 2=verbose (debug)."""
+    global _verbosity  # noqa: PLW0603
+    _verbosity = level
+
+
+def get_verbosity() -> int:
+    """Get current verbosity level."""
+    return _verbosity
+
 
 def _c(color: str, text: str) -> str:
     """Wrap text in ANSI color codes (no-op if colors disabled)."""
@@ -76,6 +90,12 @@ def log(
 
     tag = acct if acct else _acct_tag.get()
     tag_str = _c("bold", f"[{tag}]") + " " if tag else ""
+
+    # Respect verbosity
+    if _verbosity == 0 and level not in ("ERROR", "WARN"):
+        return
+    if _verbosity < 2 and level == "DEBUG":
+        return
 
     timestamp = _c("gray", ts)
     badge = _c(color, f"{_BOLD}{label}")

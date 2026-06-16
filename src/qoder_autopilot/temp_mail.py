@@ -111,16 +111,30 @@ class CloudflareProvider(TempMailProvider):
         self.url = (worker_url or config.WORKER_URL).rstrip("/")
 
     def generate(self) -> dict:
-        try:
-            r = requests.post(f"{self.url}/api/generate", timeout=15)
-            r.raise_for_status()
-        except requests.RequestException as e:
-            raise TempMailError("Failed to generate email", str(e)) from e
+        last_err = None
+        for attempt in range(1, 4):  # 3 retries
+            try:
+                r = requests.post(f"{self.url}/api/generate", timeout=15)
+                r.raise_for_status()
+            except requests.RequestException as e:
+                last_err = str(e)
+                if attempt < 3:
+                    log(f"   ⚠️ Generate attempt {attempt}/3 failed, retrying...")
+                    time.sleep(2 * attempt)
+                    continue
+                raise TempMailError("Failed to generate email", str(e)) from e
 
-        d = r.json()
-        if d.get("code") != 0:
-            raise TempMailError("Generate failed", d.get("error", "unknown"))
-        return d["data"]
+            d = r.json()
+            if d.get("code") != 0:
+                last_err = d.get("error", "unknown")
+                if attempt < 3:
+                    log(f"   ⚠️ Generate attempt {attempt}/3 failed: {last_err}")
+                    time.sleep(2 * attempt)
+                    continue
+                raise TempMailError("Generate failed", last_err)
+            return d["data"]
+
+        raise TempMailError("Failed to generate email after 3 attempts", last_err or "unknown")
 
     def inbox(self, address: str) -> list[dict]:
         try:

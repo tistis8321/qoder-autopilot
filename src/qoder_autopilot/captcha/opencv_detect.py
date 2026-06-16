@@ -54,7 +54,7 @@ async def detect_gap_position(page) -> float | None:
                 _, b64data = uri.split(",", 1)
                 return base64.b64decode(b64data)
             else:
-                return urllib.request.urlopen(uri).read()
+                return urllib.request.urlopen(uri, timeout=15).read()
 
         bg_data = parse_data_uri(img_urls["bgSrc"])
         pz_data = parse_data_uri(img_urls["pzSrc"])

@@ -289,50 +289,54 @@ def deploy_worker() -> None:
     # Step 3: Extract template
     print()
     work_dir = Path(tempfile.mkdtemp(prefix="cf-mail-worker-"))
-    log("Extracting worker template...")
-    if not extract_template(work_dir):
-        sys.exit(1)
-
-    # Step 4: Install npm dependencies
-    log("Installing worker dependencies...")
+    _cleanup_on_exit = True
     try:
-        subprocess.run(
-            ["npm", "install", "--silent"],
-            cwd=str(work_dir),
-            capture_output=True,
-            timeout=60,
-        )
-        ok("Dependencies installed")
-    except Exception as e:
-        warn(f"npm install issue: {e}")
+        log("Extracting worker template...")
+        if not extract_template(work_dir):
+            sys.exit(1)
 
-    # Step 5: Run setup wizard
-    worker_url = run_setup_wizard(work_dir)
+        # Step 4: Install npm dependencies
+        log("Installing worker dependencies...")
+        try:
+            subprocess.run(
+                ["npm", "install", "--silent"],
+                cwd=str(work_dir),
+                capture_output=True,
+                timeout=60,
+            )
+            ok("Dependencies installed")
+        except Exception as e:
+            warn(f"npm install issue: {e}")
 
-    # Step 6: Save config
-    if worker_url:
-        print()
-        save_worker_url(worker_url)
-        print()
-        print(f"  {GREEN}{BOLD}🎉 Deploy complete!{NC}")
-        print()
-        print(f"  {CYAN}Don't forget to enable Email Routing in Cloudflare Dashboard:{NC}")
-        print("  Email → Routing Rules → Catch-all → Send to Worker")
-        print()
-        print(f"  {CYAN}Run qoder-autopilot to start:{NC}")
-        print("  qoder-autopilot --manual-captcha")
-        print()
-    else:
-        print()
-        warn("Worker URL not detected. You can set it manually:")
-        print("  qoder-autopilot config set worker-url https://your-worker.workers.dev")
-        print()
+        # Step 5: Run setup wizard
+        worker_url = run_setup_wizard(work_dir)
 
-    # Cleanup: ask if user wants to keep the extracted files
-    print(f"  Worker files at: {work_dir}")
-    keep = input(f"  {BOLD}[?]{NC} Keep extracted files? [y/N]: ").strip().lower()
-    if keep != "y":
-        shutil.rmtree(work_dir, ignore_errors=True)
-        ok("Cleaned up temporary files")
-    else:
-        ok(f"Files kept at: {work_dir}")
+        # Step 6: Save config
+        if worker_url:
+            print()
+            save_worker_url(worker_url)
+            print()
+            print(f"  {GREEN}{BOLD}🎉 Deploy complete!{NC}")
+            print()
+            print(f"  {CYAN}Don't forget to enable Email Routing in Cloudflare Dashboard:{NC}")
+            print("  Email → Routing Rules → Catch-all → Send to Worker")
+            print()
+            print(f"  {CYAN}Run qoder-autopilot to start:{NC}")
+            print("  qoder-autopilot --manual-captcha")
+            print()
+        else:
+            print()
+            warn("Worker URL not detected. You can set it manually:")
+            print("  qoder-autopilot config set worker-url https://your-worker.workers.dev")
+            print()
+
+    finally:
+        # Cleanup: ask if user wants to keep the extracted files
+        if work_dir.exists():
+            print(f"  Worker files at: {work_dir}")
+            keep = input(f"  {BOLD}[?]{NC} Keep extracted files? [y/N]: ").strip().lower()
+            if keep != "y":
+                shutil.rmtree(work_dir, ignore_errors=True)
+                ok("Cleaned up temporary files")
+            else:
+                ok(f"Files kept at: {work_dir}")

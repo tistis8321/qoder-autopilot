@@ -134,9 +134,14 @@ qoder-autopilot -n 3 --manual-captcha --delay 60
 
 | Flag | Description | Default |
 |---|---|---|
-| `-n`, `--count N` | Number of accounts to create | `1` |
+| `-n`, `--count N` | Number of accounts to create (1-100) | `1` |
 | `--manual-captcha` | Pause for manual captcha solving (forces non-headless) | `false` |
 | `--no-headless` | Show browser windows | `false` |
+| `--parallel` | Run all accounts concurrently | `false` |
+| `--delay N` | Delay between sequential accounts | `30` |
+| `--verbose`, `-v` | Show debug-level logs | `false` |
+| `--quiet`, `-q` | Only show errors and warnings | `false` |
+| `--dry-run` | Validate configuration and exit | `false` |
 | `--no-oauth` | Skip 9Router OAuth, just register | `false` |
 | `--parallel` | Run all accounts concurrently | `false` |
 | `--delay N` | Delay between sequential accounts (seconds) | `30` |

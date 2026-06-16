@@ -63,6 +63,7 @@ def run_first_run_wizard() -> bool:
             print(f"  {DIM}For production use, we strongly recommend self-hosting.{NC}")
             print()
             _mark_configured()
+            _offer_doctor()
             return True
 
         elif choice == "2":
@@ -81,6 +82,7 @@ def run_first_run_wizard() -> bool:
 
                     deploy_worker()
                     _mark_configured()
+                    _offer_doctor()
                     return True
 
                 elif sub == "b":
@@ -90,6 +92,7 @@ def run_first_run_wizard() -> bool:
 
                         save_worker_url(url.rstrip("/"))
                         _mark_configured()
+                        _offer_doctor()
                         return True
                     else:
                         print(f"  {YELLOW}Please enter a valid URL (https://...).{NC}")
@@ -110,3 +113,17 @@ def _mark_configured() -> None:
     if not CONFIG_FILE.exists():
         CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
         CONFIG_FILE.write_text("{}")
+
+
+def _offer_doctor() -> None:
+    """Offer to run health check after setup completes."""
+    print(f"  {BOLD}[?]{NC} Run health check now? ({DIM}qoder-autopilot doctor{NC})")
+    run = input("      [y/N]: ").strip().lower()
+    if run == "y":
+        from .doctor import run_doctor
+
+        run_doctor()
+    else:
+        print()
+        print(f"  {DIM}You can run it anytime with: qoder-autopilot doctor{NC}")
+        print()

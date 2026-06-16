@@ -20,6 +20,7 @@ import json
 import os
 import stat
 from pathlib import Path
+from urllib.parse import urlparse
 
 CONFIG_DIR = Path.home() / ".qoder-autopilot"
 CONFIG_FILE = CONFIG_DIR / "config.json"
@@ -183,6 +184,12 @@ def set_user_config_value(key: str, value: str) -> bool:
         except ValueError:
             return False
     else:
+        # M4: Validate URLs
+        url_keys = {"worker_url", "moca_base_url", "ai_base_url", "ninerouter_relay_url"}
+        if key in url_keys and value:
+            parsed = urlparse(value)
+            if not parsed.scheme or not parsed.netloc:
+                return False
         cfg[key] = value
 
     save_user_config(cfg)

